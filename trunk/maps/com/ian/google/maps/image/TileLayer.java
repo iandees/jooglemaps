@@ -25,54 +25,65 @@ import com.ian.google.maps.gui.TileImagePanel;
 public class TileLayer extends JPanel {
 
 	private String baseUrl;
-	
+
 	private Vector<TileImagePanel> labels;
-	
-	private Rectangle2D.Double bigArea = new Rectangle2D.Double(-256, -256, 1024, 1024);
-	private Rectangle2D.Double leftSide = new Rectangle2D.Double(-256, -256, 256, 1024);
-	
+
+	private Rectangle2D.Double bigArea = new Rectangle2D.Double(-256, -256,
+			1024, 1024);
+
+	private Rectangle2D.Double leftSide = new Rectangle2D.Double(-256, -256,
+			256, 1024);
+
 	/** The number of zoom levels for this tile layer. */
 	public static final int NUM_ZOOM_LEVELS = 17;
-	
+
 	/** The width and height of one of this layer's tiles. */
 	public static final int TILE_SIZE = 256;
-	
-	/** An array, indexed by zoom level, of the number of pixels per longitudal degree. */
+
+	/**
+	 * An array, indexed by zoom level, of the number of pixels per longitudal
+	 * degree.
+	 */
 	public static double[] PIXELS_PER_LON_DEGREE = new double[NUM_ZOOM_LEVELS];
-	
-	/** An Array, indexed by zoom level, of the number of pixels per longitudal radian. */
+
+	/**
+	 * An Array, indexed by zoom level, of the number of pixels per longitudal
+	 * radian.
+	 */
 	public static double[] PIXELS_PER_LON_RADIAN = new double[NUM_ZOOM_LEVELS];
-	
+
 	/** An array, indexed by zoom level, of the number of tiles at a zoom level. */
 	public static double[] NUM_TILES = new double[NUM_ZOOM_LEVELS];
-	
+
 	public static Point2D.Double[] BITMAP_ORIGIN = new Point2D.Double[NUM_ZOOM_LEVELS];
-	
+
 	private static double TWO_PI = 2.0 * Math.PI;
-	
+
 	private static double RADIAN_PI = Math.PI / 180.0;
-	
+
 	/* Fill in the static variables. */
 	static {
-		
+
 		double c = TILE_SIZE;
-		for(int d = NUM_ZOOM_LEVELS-1; d >= 0; --d) {
+		for (int d = NUM_ZOOM_LEVELS - 1; d >= 0; --d) {
 			PIXELS_PER_LON_DEGREE[d] = c / 360.0;
 			PIXELS_PER_LON_RADIAN[d] = c / TWO_PI;
-  			double e = c / 2.0;
-  			BITMAP_ORIGIN[d] = new Point2D.Double(e,e);
-  			NUM_TILES[d] = c / TILE_SIZE;
-  			c *= 2.0;
+			double e = c / 2.0;
+			BITMAP_ORIGIN[d] = new Point2D.Double(e, e);
+			NUM_TILES[d] = c / TILE_SIZE;
+			c *= 2.0;
 		}
+		
+		System.err.println(getBitmapCoordinate(	-73.8926,40.7763, 7));
 	}
-	
-	public static Point2D.Double getBitmapCoordinate(double a, double b,
-			int zoomLevel) {
+
+	public static Point2D.Double getBitmapCoordinate(double latitude,
+			double longitude, int zoomLevel) {
 		Point2D.Double d = new Point2D.Double(0, 0);
 
-		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + b
+		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + longitude
 				* PIXELS_PER_LON_DEGREE[zoomLevel]);
-		double e = Math.sin(a * RADIAN_PI);
+		double e = Math.sin(latitude * RADIAN_PI);
 
 		if (e > 0.9999) {
 			e = 0.9999;
@@ -85,6 +96,27 @@ public class TileLayer extends JPanel {
 		d.y = Math.floor(BITMAP_ORIGIN[zoomLevel].y + 0.5
 				* Math.log((1 + e) / (1 - e)) * -1
 				* (PIXELS_PER_LON_RADIAN[zoomLevel]));
+		return d;
+	}
+
+	public static Point2D.Double getTileCoordinate(double latitude, double longitude,
+			int zoomLevel) {
+		Point2D.Double d = getBitmapCoordinate(latitude, longitude, zoomLevel);
+		d.x = Math.floor(d.x / TILE_SIZE);
+		d.y = Math.floor(d.y / TILE_SIZE);
+
+		return d;
+	}
+	
+	public static Point2D.Double getLatLong(double latitude, double longitude, int zoomLevel) {
+		Point2D.Double d = new Point2D.Double(0,0);
+		Point2D.Double e = getBitmapCoordinate(latitude, longitude, zoomLevel);
+  		latitude = e.x;
+		longitude = e.y;
+
+		d.x = (latitude - BITMAP_ORIGIN[zoomLevel].x) / PIXELS_PER_LON_DEGREE[zoomLevel];
+		double f = (longitude - BITMAP_ORIGIN[zoomLevel].y) / (-1*PIXELS_PER_LON_RADIAN[zoomLevel]);
+		d.y = (2 * Math.atan(Math.exp(f)) - Math.PI / 2) / TWO_PI;
 		return d;
 	}
 
@@ -101,61 +133,52 @@ public class TileLayer extends JPanel {
 			int zoom = 5;
 
 			/*
-			for (int y = baseTileY; y < baseTileY + 6; y++) {
-				for (int x = baseTileX; x < baseTileX + 6; x++) {
-					URL u = new URL(baseUrl + "x=" + x + "&y=" + y + "&zoom=" + zoom);
-					ImageIcon tile = new ImageIcon(u);
-                    TileImagePanel tileLabel = new TileImagePanel(tile);
-					tileLabel.setBounds(basePixX + (x - baseTileX) * 256,
-							basePixY + (y - baseTileY) * 256, 256, 256);
-                    System.err.println(tileLabel);
-                    tileLabel.setBorder(new LineBorder(Color.black, 1));
-					this.add(tileLabel);
-					labels.add(tileLabel);
-				}
-			}
-			*/
+			 * for (int y = baseTileY; y < baseTileY + 6; y++) { for (int x =
+			 * baseTileX; x < baseTileX + 6; x++) { URL u = new URL(baseUrl +
+			 * "x=" + x + "&y=" + y + "&zoom=" + zoom); ImageIcon tile = new
+			 * ImageIcon(u); TileImagePanel tileLabel = new
+			 * TileImagePanel(tile); tileLabel.setBounds(basePixX + (x -
+			 * baseTileX) * 256, basePixY + (y - baseTileY) * 256, 256, 256);
+			 * System.err.println(tileLabel); tileLabel.setBorder(new
+			 * LineBorder(Color.black, 1)); this.add(tileLabel);
+			 * labels.add(tileLabel); } }
+			 */
 		} catch (MalformedURLException mue) {
 			mue.printStackTrace();
 		}
 	}
 
 	public void setBounds(int x, int y, int width, int height) {
-        /*
-         * if(bigArea.contains(x,y,width,height)) {
-         * if(leftSide.intersects(x,y,width,height)) { System.err.println("Left
-         * side"); } } else { System.err.println("Out of bounds!"); }
-         */
-        if (this.getTopLevelAncestor() != null) {
-            //System.err.println(this.getTopLevelAncestor().getBounds());
-            for (int i = 0; i < labels.size(); i++) {
-                TileImagePanel panel = labels.get(i);
-                if (this.getParent().getBounds().intersects(panel.getBounds()) == false) {
-                    //System.err.println("GO AWAY TILES (" + i + ")!");
-                    //this.remove(panel);
-                    //panel.remove(panel);
-                    //labels.remove(panel);
-                }
-            }
-        }
-        super.setBounds(x, y, width, height);
-        System.err.println(this.getBounds());
-    }
-
-	public void setBounds(Rectangle r) {
-		if(bigArea.contains(r)) {
-			super.setBounds(r);
+		/*
+		 * if(bigArea.contains(x,y,width,height)) {
+		 * if(leftSide.intersects(x,y,width,height)) { System.err.println("Left
+		 * side"); } } else { System.err.println("Out of bounds!"); }
+		 */
+		if (this.getTopLevelAncestor() != null) {
+			// System.err.println(this.getTopLevelAncestor().getBounds());
+			for (int i = 0; i < labels.size(); i++) {
+				TileImagePanel panel = labels.get(i);
+				if (this.getParent().getBounds().intersects(panel.getBounds()) == false) {
+					// System.err.println("GO AWAY TILES (" + i + ")!");
+					// this.remove(panel);
+					// panel.remove(panel);
+					// labels.remove(panel);
+				}
+			}
 		}
+		super.setBounds(x, y, width, height);
+		System.err.println(this.getBounds());
 	}
 
-	public void moveTo(double d, double e) {
-		
+	public void setBounds(Rectangle r) {
+		if (bigArea.contains(r)) {
+			super.setBounds(r);
+		}
 	}
 
 	public void redrawInBounds(GLatLngBounds viewBounds) {
 		GLatLng sw = viewBounds.getSouthWest();
 		GLatLng ne = viewBounds.getNorthEast();
-		
-		for()
+
 	}
 }
