@@ -19,7 +19,7 @@ public class TileGetter extends Thread {
 	public void run() {
 		while(true) {
 			if(running) {
-				TileImage
+				return;
 			}
 		}
 	}
