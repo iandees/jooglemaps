@@ -1,6 +1,7 @@
 package com.ian.google.maps.image;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -20,20 +21,17 @@ import javax.swing.border.LineBorder;
 
 import com.ian.google.maps.GLatLng;
 import com.ian.google.maps.GLatLngBounds;
+import com.ian.google.maps.GoogleMapPresentation;
 import com.ian.google.maps.gui.TileImagePanel;
 
 public class TileLayer extends JPanel {
 
+	/** The base part of the URL that the x,y, and zoom will be tacked on to. */
 	private String baseUrl;
 
-	private Vector<TileImagePanel> labels;
-
-	private Rectangle2D.Double bigArea = new Rectangle2D.Double(-256, -256,
-			1024, 1024);
-
-	private Rectangle2D.Double leftSide = new Rectangle2D.Double(-256, -256,
-			256, 1024);
-
+	/** The parent map container. */
+	private GoogleMapPresentation parentWindow;
+	
 	/** The number of zoom levels for this tile layer. */
 	public static final int NUM_ZOOM_LEVELS = 18;
 
@@ -75,13 +73,13 @@ public class TileLayer extends JPanel {
 		}
 
 		System.err.println("Lat lon for tile 647, 1584, zoom 5 = "
-				+ getLatLong(647, 1584, 5));
+				+ getTileLatLong(647, 1584, 5));
 		System.err.println("Tile x, y, z for -123.134 37.649 z=5 = "
-				+ getTileCoordinate(37.649, -123.134, 5));
+				+ getTileCoordinate(37.64903402157866, -123.134765625, 5));
 	}
 
-	public static Point2D.Double getBitmapCoordinate(double latitude, double longitude,
-			int zoomLevel) {
+	public static Point2D.Double getBitmapCoordinate(double latitude,
+			double longitude, int zoomLevel) {
 		Point2D.Double d = new Point2D.Double(0, 0);
 
 		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + longitude
@@ -102,132 +100,94 @@ public class TileLayer extends JPanel {
 		return d;
 	}
 
-	public static Point2D.Double getTileCoordinate(double latitude, double longitude,
-			int zoomLevel) {
+	public static Point getTileCoordinate(double latitude,
+			double longitude, int zoomLevel) {
 		Point2D.Double d = getBitmapCoordinate(latitude, longitude, zoomLevel);
 		d.x = Math.floor(d.x / TILE_SIZE);
 		d.y = Math.floor(d.y / TILE_SIZE);
 
-		return d;
+		return new Point((int) d.x, (int) d.y);
 	}
-	
-	/*
-	public static Point2D.Double getLatLong(double latitude, double longitude, int zoomLevel) {
-		Point2D.Double d = new Point2D.Double(0,0);
-		Point2D.Double e = getBitmapCoordinate(latitude, longitude, zoomLevel);
-  		latitude = e.x;
-		longitude = e.y;
 
-		d.x = (latitude - BITMAP_ORIGIN[zoomLevel].x) / PIXELS_PER_LON_DEGREE[zoomLevel];
-		double f = (longitude - BITMAP_ORIGIN[zoomLevel].y) / (-1*PIXELS_PER_LON_RADIAN[zoomLevel]);
-		d.y = (2 * Math.atan(Math.exp(f)) - Math.PI / 2) / TWO_PI;
-		return d;
-	}*/
-	
-	   /**
-	   * returns a Rectangle2D with x = lon, y = lat, width=lonSpan, height=latSpan
-	   * for an x,y,zoom as used by google.
-	   */
-	   public static Rectangle2D.Double getLatLong(int x, int y, int zoom) {
-	      double lon      = -180; // x
-	      double lonWidth = 360; // width 360
+	/**
+	 * returns a Rectangle2D with x = lon, y = lat, width=lonSpan,
+	 * height=latSpan for an x,y,zoom as used by google.
+	 */
+	public static Rectangle2D.Double getTileLatLong(int x, int y, int zoom) {
+		double lon = -180; // x
+		double lonWidth = 360; // width 360
 
-	      //double lat = -90;  // y
-	      //double latHeight = 180; // height 180
-	      double lat       = -1;
-	      double latHeight = 2;
+		// double lat = -90; // y
+		// double latHeight = 180; // height 180
+		double lat = -1;
+		double latHeight = 2;
 
-	      int tilesAtThisZoom = 1 << (17 - zoom);
-	      lonWidth  = 360.0 / tilesAtThisZoom;
-	      lon       = -180 + (x * lonWidth);
-	      latHeight = -2.0 / tilesAtThisZoom;
-	      lat       = 1 + (y * latHeight);
+		int tilesAtThisZoom = 1 << (17 - zoom);
+		lonWidth = 360.0 / tilesAtThisZoom;
+		lon = -180 + (x * lonWidth);
+		latHeight = -2.0 / tilesAtThisZoom;
+		lat = 1 + (y * latHeight);
 
-	      // convert lat and latHeight to degrees in a transverse mercator projection
-	      // note that in fact the coordinates go from about -85 to +85 not -90 to 90!
-	      latHeight += lat;
-	      latHeight = (2 * Math.atan(Math.exp(Math.PI * latHeight))) - (Math.PI / 2);
-	      latHeight *= (180 / Math.PI);
+		// convert lat and latHeight to degrees in a transverse mercator
+		// projection note that in fact the coordinates go from about -85 to +85
+		// not -90 to 90!
+		latHeight += lat;
+		latHeight = (2 * Math.atan(Math.exp(Math.PI * latHeight)))
+				- (Math.PI / 2);
+		latHeight *= (180 / Math.PI);
 
-	      lat = (2 * Math.atan(Math.exp(Math.PI * lat))) - (Math.PI / 2);
-	      lat *= (180 / Math.PI);
+		lat = (2 * Math.atan(Math.exp(Math.PI * lat))) - (Math.PI / 2);
+		lat *= (180 / Math.PI);
 
-	      latHeight -= lat;
+		latHeight -= lat;
 
-	      if (lonWidth < 0) {
-	         lon      = lon + lonWidth;
-	         lonWidth = -lonWidth;
-	      }
-
-	      if (latHeight < 0) {
-	         lat       = lat + latHeight;
-	         latHeight = -latHeight;
-	      }
-
-	      return new Rectangle2D.Double(lon, lat, lonWidth, latHeight);
-	   }
-	   
-	   
-
-	public TileLayer(String base) {
-		try {
-			labels = new Vector<TileImagePanel>();
-			this.setLayout(null);
-			this.baseUrl = base;
-
-			int baseTileX = 1043;
-			int basePixX = 0;
-			int baseTileY = 1501;
-			int basePixY = 0;
-			int zoom = 5;
-
-			/*
-			 * for (int y = baseTileY; y < baseTileY + 6; y++) { for (int x =
-			 * baseTileX; x < baseTileX + 6; x++) { URL u = new URL(baseUrl +
-			 * "x=" + x + "&y=" + y + "&zoom=" + zoom); ImageIcon tile = new
-			 * ImageIcon(u); TileImagePanel tileLabel = new
-			 * TileImagePanel(tile); tileLabel.setBounds(basePixX + (x -
-			 * baseTileX) * 256, basePixY + (y - baseTileY) * 256, 256, 256);
-			 * System.err.println(tileLabel); tileLabel.setBorder(new
-			 * LineBorder(Color.black, 1)); this.add(tileLabel);
-			 * labels.add(tileLabel); } }
-			 */
-		} catch (MalformedURLException mue) {
-			mue.printStackTrace();
+		if (lonWidth < 0) {
+			lon = lon + lonWidth;
+			lonWidth = -lonWidth;
 		}
+
+		if (latHeight < 0) {
+			lat = lat + latHeight;
+			latHeight = -latHeight;
+		}
+
+		return new Rectangle2D.Double(lon, lat, lonWidth, latHeight);
+	}
+
+	public TileLayer(GoogleMapPresentation parent, String base) {
+		this.setLayout(null);
+		this.baseUrl = base;
+		this.parentWindow = parent;
 	}
 
 	public void setBounds(int x, int y, int width, int height) {
-		/*
-		 * if(bigArea.contains(x,y,width,height)) {
-		 * if(leftSide.intersects(x,y,width,height)) { System.err.println("Left
-		 * side"); } } else { System.err.println("Out of bounds!"); }
-		 */
-		if (this.getTopLevelAncestor() != null) {
-			// System.err.println(this.getTopLevelAncestor().getBounds());
-			for (int i = 0; i < labels.size(); i++) {
-				TileImagePanel panel = labels.get(i);
-				if (this.getParent().getBounds().intersects(panel.getBounds()) == false) {
-					// System.err.println("GO AWAY TILES (" + i + ")!");
-					// this.remove(panel);
-					// panel.remove(panel);
-					// labels.remove(panel);
-				}
+		
+		super.setBounds(x, y, width, height);
+	}
+
+	public void paintComponents(Graphics g) {
+		// Paint the tiles that we can see
+		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
+		GLatLng sw = parentBounds.getSouthWest();
+		GLatLng ne = parentBounds.getNorthEast();
+		
+		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), this.parentWindow.getZoom());
+		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), this.parentWindow.getZoom());
+		
+		for(int x = swTile.x; x < neTile.x; x++) {
+			for(int y = swTile.y; y < neTile.y; y++) {
+				System.err.println("Painting a tile: x: " + x + " y: " + y);
 			}
 		}
-		super.setBounds(x, y, width, height);
-		System.err.println(this.getBounds());
+		super.paintComponents(g);
 	}
 
 	public void setBounds(Rectangle r) {
-		if (bigArea.contains(r)) {
-			super.setBounds(r);
-		}
+
 	}
 
 	public void redrawInBounds(GLatLngBounds viewBounds) {
 		GLatLng sw = viewBounds.getSouthWest();
 		GLatLng ne = viewBounds.getNorthEast();
-
 	}
 }
