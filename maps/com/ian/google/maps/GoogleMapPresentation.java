@@ -46,7 +46,8 @@ public class GoogleMapPresentation extends JFrame {
 
 	public void setLatLngBounds(GLatLngBounds bounds) {
 		this.viewBounds = bounds;
-		this.updateMap();
+		System.err.println(tileLayer.pixelToLatLng(new Point(0,0)));
+		this.redrawMap();
 	}
 	
 	public void transformBounds(GLatLng delta) {
@@ -56,12 +57,12 @@ public class GoogleMapPresentation extends JFrame {
 
 	public void redrawMap() {
 		// TODO - only support for one tile layer right now
-		this.tileLayer.redrawInBounds(this.viewBounds);
+		this.tileLayer.repaint();
 		System.err.println(this.viewBounds);
 	}
 
 	public void updateMap() {
-		this.repaint();
+		this.paintAll(this.getGraphics());
 	}
 
 	public Point getOrigin() {
@@ -74,7 +75,6 @@ public class GoogleMapPresentation extends JFrame {
 		tileLayer.setBounds((int) (origin.x), (int) (origin.y), tileLayer
 				.getWidth(), tileLayer.getHeight());
 
-		//System.err.println(this.viewBounds);
 	}
 
 	public void setCenter(GLatLng center, int zoom) {
@@ -82,11 +82,16 @@ public class GoogleMapPresentation extends JFrame {
 		// window, calculate the LatLngBounds
 		int windowWidth = this.getWidth();
 		int windowHeight = this.getHeight();
-		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[zoom];
+		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[17-zoom];
 		this.zoomLevel = zoom;
 		
-		GLatLng sw = new GLatLng(center.lat()-((windowWidth/2)*pixelsPerDegree), center.lng()-((windowHeight/2*pixelsPerDegree)));
-		GLatLng ne = new GLatLng(center.lat()+((windowWidth/2)*pixelsPerDegree), center.lng()+((windowHeight/2*pixelsPerDegree)));
+		double widthOfWindowDegree = (windowWidth / pixelsPerDegree) / 2;
+		double heightOfWindowDegree = (windowHeight / pixelsPerDegree) / 2;
+		
+		System.err.println("height: " + heightOfWindowDegree + " width: " + widthOfWindowDegree);
+		
+		GLatLng sw = new GLatLng(center.lat() - widthOfWindowDegree, center.lng() - heightOfWindowDegree);
+		GLatLng ne = new GLatLng(center.lat() + widthOfWindowDegree, center.lng() + heightOfWindowDegree);
 		
 		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
@@ -98,5 +103,9 @@ public class GoogleMapPresentation extends JFrame {
 	public void setZoom(int zoom) {
 		this.zoomLevel = zoom;
 		// TODO - we have to update the map here
+	}
+
+	public TileLayer getTileLayer() {
+		return this.tileLayer;
 	}
 }

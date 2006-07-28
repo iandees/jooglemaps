@@ -26,9 +26,10 @@ public class GLatLngBounds {
 		return northEast.midpointTo(southWest);
 	}
 
-	public void transform(GLatLng delta) {
+	public GLatLngBounds transform(GLatLng delta) {
 		this.northEast.transform(delta);
 		this.southWest.transform(delta);
+		return this;
 	}
 	
 	public String toString() {
