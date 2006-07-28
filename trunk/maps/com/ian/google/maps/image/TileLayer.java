@@ -35,7 +35,7 @@ public class TileLayer extends JPanel {
 			256, 1024);
 
 	/** The number of zoom levels for this tile layer. */
-	public static final int NUM_ZOOM_LEVELS = 17;
+	public static final int NUM_ZOOM_LEVELS = 18;
 
 	/** The width and height of one of this layer's tiles. */
 	public static final int TILE_SIZE = 256;
@@ -64,21 +64,24 @@ public class TileLayer extends JPanel {
 	/* Fill in the static variables. */
 	static {
 
-		double c = TILE_SIZE;
+		int c = TILE_SIZE;
 		for (int d = NUM_ZOOM_LEVELS - 1; d >= 0; --d) {
-			PIXELS_PER_LON_DEGREE[d] = c / 360.0;
+			PIXELS_PER_LON_DEGREE[d] = c / 360;
 			PIXELS_PER_LON_RADIAN[d] = c / TWO_PI;
 			double e = c / 2.0;
 			BITMAP_ORIGIN[d] = new Point2D.Double(e, e);
 			NUM_TILES[d] = c / TILE_SIZE;
 			c *= 2.0;
 		}
-		
-		System.err.println(getBitmapCoordinate(	-73.8926,40.7763, 7));
+
+		System.err.println("Lat lon for tile 647, 1584, zoom 5 = "
+				+ getLatLong(647, 1584, 5));
+		System.err.println("Tile x, y, z for -123.134 37.649 z=5 = "
+				+ getTileCoordinate(37.649, -123.134, 5));
 	}
 
-	public static Point2D.Double getBitmapCoordinate(double latitude,
-			double longitude, int zoomLevel) {
+	public static Point2D.Double getBitmapCoordinate(double latitude, double longitude,
+			int zoomLevel) {
 		Point2D.Double d = new Point2D.Double(0, 0);
 
 		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + longitude
@@ -89,7 +92,7 @@ public class TileLayer extends JPanel {
 			e = 0.9999;
 		}
 
-		if (e < 0.9999) {
+		if (e < -0.9999) {
 			e = -0.9999;
 		}
 
@@ -108,6 +111,7 @@ public class TileLayer extends JPanel {
 		return d;
 	}
 	
+	/*
 	public static Point2D.Double getLatLong(double latitude, double longitude, int zoomLevel) {
 		Point2D.Double d = new Point2D.Double(0,0);
 		Point2D.Double e = getBitmapCoordinate(latitude, longitude, zoomLevel);
@@ -118,7 +122,52 @@ public class TileLayer extends JPanel {
 		double f = (longitude - BITMAP_ORIGIN[zoomLevel].y) / (-1*PIXELS_PER_LON_RADIAN[zoomLevel]);
 		d.y = (2 * Math.atan(Math.exp(f)) - Math.PI / 2) / TWO_PI;
 		return d;
-	}
+	}*/
+	
+	   /**
+	   * returns a Rectangle2D with x = lon, y = lat, width=lonSpan, height=latSpan
+	   * for an x,y,zoom as used by google.
+	   */
+	   public static Rectangle2D.Double getLatLong(int x, int y, int zoom) {
+	      double lon      = -180; // x
+	      double lonWidth = 360; // width 360
+
+	      //double lat = -90;  // y
+	      //double latHeight = 180; // height 180
+	      double lat       = -1;
+	      double latHeight = 2;
+
+	      int tilesAtThisZoom = 1 << (17 - zoom);
+	      lonWidth  = 360.0 / tilesAtThisZoom;
+	      lon       = -180 + (x * lonWidth);
+	      latHeight = -2.0 / tilesAtThisZoom;
+	      lat       = 1 + (y * latHeight);
+
+	      // convert lat and latHeight to degrees in a transverse mercator projection
+	      // note that in fact the coordinates go from about -85 to +85 not -90 to 90!
+	      latHeight += lat;
+	      latHeight = (2 * Math.atan(Math.exp(Math.PI * latHeight))) - (Math.PI / 2);
+	      latHeight *= (180 / Math.PI);
+
+	      lat = (2 * Math.atan(Math.exp(Math.PI * lat))) - (Math.PI / 2);
+	      lat *= (180 / Math.PI);
+
+	      latHeight -= lat;
+
+	      if (lonWidth < 0) {
+	         lon      = lon + lonWidth;
+	         lonWidth = -lonWidth;
+	      }
+
+	      if (latHeight < 0) {
+	         lat       = lat + latHeight;
+	         latHeight = -latHeight;
+	      }
+
+	      return new Rectangle2D.Double(lon, lat, lonWidth, latHeight);
+	   }
+	   
+	   
 
 	public TileLayer(String base) {
 		try {
