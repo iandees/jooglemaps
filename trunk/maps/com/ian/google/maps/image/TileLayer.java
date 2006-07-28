@@ -65,6 +65,28 @@ public class TileLayer extends JPanel {
   			c *= 2.0;
 		}
 	}
+	
+	public static Point2D.Double getBitmapCoordinate(double a, double b,
+			int zoomLevel) {
+		Point2D.Double d = new Point2D.Double(0, 0);
+
+		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + b
+				* PIXELS_PER_LON_DEGREE[zoomLevel]);
+		double e = Math.sin(a * RADIAN_PI);
+
+		if (e > 0.9999) {
+			e = 0.9999;
+		}
+
+		if (e < 0.9999) {
+			e = -0.9999;
+		}
+
+		d.y = Math.floor(BITMAP_ORIGIN[zoomLevel].y + 0.5
+				* Math.log((1 + e) / (1 - e)) * -1
+				* (PIXELS_PER_LON_RADIAN[zoomLevel]));
+		return d;
+	}
 
 	public TileLayer(String base) {
 		try {
