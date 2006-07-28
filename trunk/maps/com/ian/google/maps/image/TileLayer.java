@@ -165,29 +165,46 @@ public class TileLayer extends JPanel {
 		super.setBounds(x, y, width, height);
 	}
 
-	public void paintComponents(Graphics g) {
+	public void paint(Graphics g) {
 		// Paint the tiles that we can see
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
 		GLatLng sw = parentBounds.getSouthWest();
 		GLatLng ne = parentBounds.getNorthEast();
+		int zoom = 17-this.parentWindow.getZoom();
 		
-		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), this.parentWindow.getZoom());
-		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), this.parentWindow.getZoom());
+		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
+		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
 		
-		for(int x = swTile.x; x < neTile.x; x++) {
-			for(int y = swTile.y; y < neTile.y; y++) {
-				System.err.println("Painting a tile: x: " + x + " y: " + y);
+		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
+		
+		for(int x = neTile.x; x < swTile.x; x++) {
+			for(int y = neTile.y; y < swTile.y; y++) {
+				
+				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom);
 			}
 		}
 		super.paintComponents(g);
 	}
-
-	public void setBounds(Rectangle r) {
-
+	
+	public GLatLng pixelToLatLng(Point pixelPoint) {
+		int zoom = 17-parentWindow.getZoom();
+		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
+		GLatLng sw = parentBounds.getSouthWest();
+		
+		double lat = sw.lat() + (pixelPoint.y / PIXELS_PER_LON_DEGREE[zoom]);
+		double lng = sw.lng() + (pixelPoint.x / PIXELS_PER_LON_DEGREE[zoom]);
+		
+		return new GLatLng(lat, lng);
 	}
-
-	public void redrawInBounds(GLatLngBounds viewBounds) {
-		GLatLng sw = viewBounds.getSouthWest();
-		GLatLng ne = viewBounds.getNorthEast();
+	
+	public Point latLngToPixel(GLatLng mapPoint) {
+		int zoom = 17-parentWindow.getZoom();
+		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
+		GLatLng sw = parentBounds.getSouthWest();
+		
+		int x = (int) ((PIXELS_PER_LON_DEGREE[zoom] * mapPoint.lng()) - sw.lng());
+		int y = (int) ((PIXELS_PER_LON_DEGREE[zoom] * mapPoint.lat()) - sw.lat());
+		
+		return new Point(x, y);
 	}
 }

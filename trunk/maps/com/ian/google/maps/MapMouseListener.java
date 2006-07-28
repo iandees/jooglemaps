@@ -20,6 +20,7 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	}
 
 	public void mouseClicked(MouseEvent e) {
+		System.err.println("Click at: " + pres.getTileLayer().pixelToLatLng(e.getPoint()));
 	}
 
 	public void mouseEntered(MouseEvent e) {
@@ -44,7 +45,8 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 		int dY = (e.getY()-initialClick.y);
 		double dLat = dX * TileLayer.PIXELS_PER_LON_DEGREE[pres.getZoom()];
 		double dLng = dY * TileLayer.PIXELS_PER_LON_DEGREE[pres.getZoom()];
-		pres.transformBounds(new GLatLng(dLat, dLng));
+		
+		pres.setLatLngBounds(new GLatLngBounds(pres.getLatLngBounds().transform(new GLatLng(dLat, dLng))));
 		//Point newOrigin = new Point(originalOrigin.x + dX, originalOrigin.y + dY);
 		//this.pres.setOrigin(newOrigin.x, newOrigin.y);
 	}
