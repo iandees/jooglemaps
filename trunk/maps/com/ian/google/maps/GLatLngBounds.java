@@ -30,4 +30,8 @@ public class GLatLngBounds {
 		this.northEast.transform(delta);
 		this.southWest.transform(delta);
 	}
+	
+	public String toString() {
+		return "(" + this.southWest + "," + this.northEast + ")";
+	}
 }

@@ -10,7 +10,7 @@ import com.ian.google.maps.image.TileLayer;
 
 public class GoogleMapPresentation extends JFrame {
 
-	private TileLayer tileLayer = new TileLayer(
+	private TileLayer tileLayer = new TileLayer(this,
 			"http://mt2.google.com/mt?n=404&v=w2.17&");
 
 	private MapMouseListener mouseListener = new MapMouseListener(this);
@@ -18,6 +18,8 @@ public class GoogleMapPresentation extends JFrame {
 	private Point origin = new Point(0, 0);
 
 	private GLatLngBounds viewBounds = null;
+	
+	private int zoomLevel = 17;
 
 	public GoogleMapPresentation() {
 		super("Map");
@@ -31,7 +33,7 @@ public class GoogleMapPresentation extends JFrame {
 
 		this.addMouseListener(mouseListener);
 		this.addMouseMotionListener(mouseListener);
-
+		
 		Container c = this.getContentPane();
         tileLayer.setBounds(0,0,2048,2048);
 		//tileLayer.setBounds(0, 0, 512, 512);
@@ -46,10 +48,20 @@ public class GoogleMapPresentation extends JFrame {
 		this.viewBounds = bounds;
 		this.updateMap();
 	}
+	
+	public void transformBounds(GLatLng delta) {
+		this.viewBounds.transform(delta);
+		this.redrawMap();
+	}
+
+	public void redrawMap() {
+		// TODO - only support for one tile layer right now
+		this.tileLayer.redrawInBounds(this.viewBounds);
+		System.err.println(this.viewBounds);
+	}
 
 	public void updateMap() {
-		// TODO Auto-generated method stub
-
+		this.repaint();
 	}
 
 	public Point getOrigin() {
@@ -61,23 +73,30 @@ public class GoogleMapPresentation extends JFrame {
 		this.origin.y = y;
 		tileLayer.setBounds((int) (origin.x), (int) (origin.y), tileLayer
 				.getWidth(), tileLayer.getHeight());
+
+		//System.err.println(this.viewBounds);
 	}
 
-	public void setCenter(GLatLng latlng, int zoom) {
+	public void setCenter(GLatLng center, int zoom) {
 		// Based on the center lat/lng given and the width and height of the
 		// window, calculate the LatLngBounds
 		int windowWidth = this.getWidth();
 		int windowHeight = this.getHeight();
+		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[zoom];
+		this.zoomLevel = zoom;
 		
+		GLatLng sw = new GLatLng(center.lat()-((windowWidth/2)*pixelsPerDegree), center.lng()-((windowHeight/2*pixelsPerDegree)));
+		GLatLng ne = new GLatLng(center.lat()+((windowWidth/2)*pixelsPerDegree), center.lng()+((windowHeight/2*pixelsPerDegree)));
 		
+		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
 
-	public Point fromLatLngToPixel(GLatLng latLng) {
-		// TODO Auto-generated method stub
-		return null;
+	public int getZoom() {
+		return this.zoomLevel;
 	}
-
-	public GLatLng fromPixelToLatLng(Point point) {
-		return null;
+	
+	public void setZoom(int zoom) {
+		this.zoomLevel = zoom;
+		// TODO - we have to update the map here
 	}
 }
