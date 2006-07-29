@@ -62,6 +62,10 @@ public class TileLayer extends JPanel {
 	private static double TWO_PI = 2.0 * Math.PI;
 
 	private static double RADIAN_PI = Math.PI / 180.0;
+    
+    private static double qd(double a) {
+        return a / (Math.PI/180.0);
+    }
 
 	/* Fill in the static variables. */
 	static {
@@ -76,10 +80,6 @@ public class TileLayer extends JPanel {
 			c *= 2.0;
 		}
 
-		System.err.println("Lat lon for tile 647, 1584, zoom 5 = "
-				+ getTileLatLong(647, 1584, 5));
-		System.err.println("Tile x, y, z for -123.134 37.649 z=5 = "
-				+ getTileCoordinate(37.64903402157866, -123.134765625, 5));
 	}
 
 	public static Point2D.Double getBitmapCoordinate(double latitude,
@@ -177,16 +177,22 @@ public class TileLayer extends JPanel {
 		GLatLng ne = parentBounds.getNorthEast();
 		int zoom = 17-this.parentWindow.getZoom();
 		
+        // Get the numbers for tiles that are at each of our window's corners
 		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
 		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
 		
-		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
+		//System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 		
-		for(int x = neTile.x; x < swTile.x; x++) {
-			for(int y = neTile.y; y < swTile.y; y++) {
+        // For each of the tiles in between the corner tiles...
+		for(int x = swTile.x; x < neTile.x; x++) {
+			for(int y = swTile.y; y > neTile.y; y--) {
+                // Determine the tile's lat/long coordinate
 				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
-                Point tileloc = latLngToPixel(new Point2D.Double(ll.x, ll.y));
-                ImageIcon l = cache.get(tileloc, zoom);
+                // Determine where in the window that tile should go
+                Point tileloc = this.latLngToPixel(new Point2D.Double(ll.x, ll.y));
+                // Load the image from the cache
+                //ImageIcon l = cache.get(tileloc, zoom);
+                // Draw a rectangle over where the image is supposed to be
                 g.drawRect(tileloc.x, tileloc.y, 256, 256);
 				//System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
@@ -194,25 +200,79 @@ public class TileLayer extends JPanel {
 		super.paintComponents(g);
 	}
 	
+    /*
 	public Point2D.Double pixelToLatLng(Point pixelPoint) {
 		int zoom = 17-parentWindow.getZoom();
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
-		GLatLng sw = parentBounds.getSouthWest();
+		GLatLng sw = parentBounds.getNorthWest();
 		
 		double lat = sw.lat() + (pixelPoint.y / PIXELS_PER_LON_DEGREE[zoom]);
 		double lng = sw.lng() + (pixelPoint.x / PIXELS_PER_LON_DEGREE[zoom]);
 		
 		return new Point2D.Double(lat, lng);
 	}
+    */
 	
 	public Point latLngToPixel(Point2D.Double mapPoint) {
 		int zoom = 17-parentWindow.getZoom();
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
 		GLatLng nw = parentBounds.getNorthWest();
 		
-		int x = (int) (mapPoint.x / (PIXELS_PER_LON_DEGREE[zoom]));
-		int y = (int) (mapPoint.y / (PIXELS_PER_LON_DEGREE[zoom]));
+        int x = lngToX(mapPoint.x) - lngToX(nw.lng());
+        int y = latToY(mapPoint.y) - latToY(nw.lat());
+        
+		//int x = (int) ((mapPoint.x-nw.lng()) * (PIXELS_PER_LON_DEGREE[zoom]));
+		//int y = (int) ((mapPoint.y-nw.lat()) * (PIXELS_PER_LON_DEGREE[zoom]));
 		
 		return new Point(x, y);
 	}
+    
+    public int lngToX(double longitudeDegrees) {
+        int tiles = (int) Math.pow(2, this.parentWindow.getZoom());
+        int circumference = TILE_SIZE * tiles;
+        double falseEasting=1*circumference/2;
+        double radius = circumference/ (2.0 * Math.PI);
+        double longitude = (longitudeDegrees * RADIAN_PI);
+        int x=(int) (radius * longitude + falseEasting);
+        return (x);
+    }
+    
+    public double xToLng(int x) {
+        int tiles = (int) Math.pow(2, this.parentWindow.getZoom());
+        int circumference = TILE_SIZE * tiles;
+        double falseEasting=1*circumference/2;
+        double radius = circumference/ (2.0 * Math.PI);
+        double lng = ((x - falseEasting) / radius);
+        return lng;
+    }
+    
+    public int latToY(double latitudeDegrees) {
+        int tiles = (int) Math.pow(2, this.parentWindow.getZoom());
+        int circumference = TILE_SIZE * tiles;
+        double falseNorthing=-circumference/2;
+        double radius = circumference/ (2.0 * Math.PI);
+        double lat = latitudeDegrees * RADIAN_PI;
+        int y = (int) -(radius/2.0 *
+                Math.log( (1.0 + Math.sin(lat)) /
+                     (1.0 - Math.sin(lat)) )+ falseNorthing);
+        return y;
+    }
+    
+    public double yToLat(int y) {
+        int zoom = this.parentWindow.getZoom();
+        Point2D.Double e=BITMAP_ORIGIN[zoom];
+        //double f=(pixel.x-e.x)/PIXELS_PER_LON_DEGREE[zoom];
+        double g=(y-e.y)/-PIXELS_PER_LON_RADIAN[zoom];
+        double h=qd(2*Math.atan(Math.exp(g))-Math.PI/2);
+        return h;
+    }
+    
+    public GLatLng pixelToLatLng(Point pixel) {
+        int zoom = this.parentWindow.getZoom();
+        Point2D.Double e=BITMAP_ORIGIN[zoom];
+        double f=(pixel.x-e.x)/PIXELS_PER_LON_DEGREE[zoom];
+        double g=(pixel.y-e.y)/-PIXELS_PER_LON_RADIAN[zoom];
+        double h=qd(2*Math.atan(Math.exp(g))-Math.PI/2);
+        return new GLatLng(h,f);
+    }
 }

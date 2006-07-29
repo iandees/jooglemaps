@@ -13,7 +13,7 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	
 	private Point initialClick = null;
 
-	private Point originalOrigin;
+    private GLatLngBounds initialBounds;
 	
 	public MapMouseListener(GoogleMapPresentation presentation) {
 		this.pres = presentation;
@@ -33,7 +33,6 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 
 	public void mousePressed(MouseEvent e) {
 		initialClick = new Point(e.getX(), e.getY());
-		originalOrigin = new Point(pres.getOrigin());
 	}
 
 	public void mouseReleased(MouseEvent e) {
@@ -43,10 +42,7 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	public void mouseDragged(MouseEvent e) {
 		int dX = (e.getX()-initialClick.x);
 		int dY = (e.getY()-initialClick.y);
-		double dLat = dX * TileLayer.PIXELS_PER_LON_DEGREE[pres.getZoom()];
-		double dLng = dY * TileLayer.PIXELS_PER_LON_DEGREE[pres.getZoom()];
-		
-		pres.setLatLngBounds(new GLatLngBounds(pres.getLatLngBounds().transform(new GLatLng(dLat, dLng))));
+        pres.moveToPixels(e.getX(), e.getY());
 		//Point newOrigin = new Point(originalOrigin.x + dX, originalOrigin.y + dY);
 		//this.pres.setOrigin(newOrigin.x, newOrigin.y);
 	}
