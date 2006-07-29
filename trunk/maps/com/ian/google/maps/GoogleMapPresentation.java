@@ -16,8 +16,6 @@ public class GoogleMapPresentation extends JFrame {
 
 	private MapMouseListener mouseListener = new MapMouseListener(this);
 
-	private Point origin = new Point(0, 0);
-
 	private GLatLngBounds viewBounds = null;
 	
 	private int zoomLevel = 17;
@@ -62,35 +60,19 @@ public class GoogleMapPresentation extends JFrame {
 		this.tileLayer.repaint();
 	}
 
-	public void updateMap() {
-		this.paintAll(this.getGraphics());
-	}
-
-	public Point getOrigin() {
-		return this.origin;
-	}
-
-	public void setOrigin(int x, int y) {
-		this.origin.x = x;
-		this.origin.y = y;
-		tileLayer.setBounds((int) (origin.x), (int) (origin.y), tileLayer
-				.getWidth(), tileLayer.getHeight());
-
-	}
-
 	public void setCenter(GLatLng center, int zoom) {
 		// Based on the center lat/lng given and the width and height of the
 		// window, calculate the LatLngBounds
-		int windowWidth = this.getWidth();
-		int windowHeight = this.getHeight();
-		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[17-zoom];
-		this.zoomLevel = zoom;
+        this.zoomLevel = 17-zoom;
+		int windowWidth = getWidth();
+		int windowHeight = getHeight();
+		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[this.getZoom()];
 		
-		double widthOfWindowDegree = (windowWidth / pixelsPerDegree) / 2;
-		double heightOfWindowDegree = (windowHeight / pixelsPerDegree) / 2;
+		double widthOfWindowDegree = (pixelsPerDegree / (windowWidth / 2));
+		double heightOfWindowDegree = (pixelsPerDegree / (windowHeight / 2));
 		
-		GLatLng sw = new GLatLng(center.lat() - widthOfWindowDegree, center.lng() - heightOfWindowDegree);
-		GLatLng ne = new GLatLng(center.lat() + widthOfWindowDegree, center.lng() + heightOfWindowDegree);
+		GLatLng sw = new GLatLng(center.lat() + (widthOfWindowDegree), center.lng() + (heightOfWindowDegree));
+		GLatLng ne = new GLatLng(center.lat() - (widthOfWindowDegree), center.lng() - (heightOfWindowDegree));
 		
 		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
@@ -107,13 +89,33 @@ public class GoogleMapPresentation extends JFrame {
 	public TileLayer getTileLayer() {
 		return this.tileLayer;
 	}
-
+    
     public void runatest() {
-        System.err.println("Bounds for the view:");
-        System.err.println(this.getLatLngBounds());
+
+        System.err.println("Lat lon for tile 647, 1584, zoom 5 = "
+                + TileLayer.getTileLatLong(647, 1584, 5));
+        System.err.println("Tile x, y, z for -123.134 37.649 z=5 = "
+                + TileLayer.getTileCoordinate(37.64903402157866, -123.134765625, 5));
+        
+        System.err.println("Northwest for bounds: " + this.getLatLngBounds().getNorthWest());
+        System.err.println("Northeast for bounds: " + this.getLatLngBounds().getNorthEast());
+        System.err.println("Southeast for bounds: " + this.getLatLngBounds().getSouthEast());
+        System.err.println("Southwest for bounds: " + this.getLatLngBounds().getSouthWest());
         System.err.println("Pixel for -122.09795150214593, 37.48584849785407:");
         System.err.println(tileLayer.latLngToPixel(new Point2D.Double(-122.09795150214593, 37.48584849785407)));
         System.err.println("LatLng for 0,0:");
         System.err.println(tileLayer.pixelToLatLng(new Point(0,0)));
+        System.err.println("LatLng for 512,512:");
+        System.err.println(tileLayer.pixelToLatLng(new Point(512,512)));
+
+        System.err.println("----------------");
+    }
+
+    public void moveToPixels(int x, int y) {
+        // Determine how many degrees lat and lng the change represents
+        GLatLng l = tileLayer.pixelToLatLng(new Point(x,y));
+        System.err.println("dx: " + l.lng() + " dy: " + l.lat());
+        
+        // Move the view pane by that much
     }
 }
