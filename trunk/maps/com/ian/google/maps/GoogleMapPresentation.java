@@ -2,6 +2,7 @@ package com.ian.google.maps;
 
 import java.awt.Container;
 import java.awt.Point;
+import java.awt.geom.Point2D;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -11,7 +12,7 @@ import com.ian.google.maps.image.TileLayer;
 public class GoogleMapPresentation extends JFrame {
 
 	private TileLayer tileLayer = new TileLayer(this,
-			"http://mt2.google.com/mt?n=404&v=w2.17&");
+			"http://mt3.google.com/mt?n=404&v=w2.17&");
 
 	private MapMouseListener mouseListener = new MapMouseListener(this);
 
@@ -38,6 +39,8 @@ public class GoogleMapPresentation extends JFrame {
         tileLayer.setBounds(0,0,2048,2048);
 		//tileLayer.setBounds(0, 0, 512, 512);
 		c.add(tileLayer);
+        
+        
 	}
 
 	public GLatLngBounds getLatLngBounds() {
@@ -46,7 +49,6 @@ public class GoogleMapPresentation extends JFrame {
 
 	public void setLatLngBounds(GLatLngBounds bounds) {
 		this.viewBounds = bounds;
-		System.err.println(tileLayer.pixelToLatLng(new Point(0,0)));
 		this.redrawMap();
 	}
 	
@@ -58,7 +60,6 @@ public class GoogleMapPresentation extends JFrame {
 	public void redrawMap() {
 		// TODO - only support for one tile layer right now
 		this.tileLayer.repaint();
-		System.err.println(this.viewBounds);
 	}
 
 	public void updateMap() {
@@ -88,8 +89,6 @@ public class GoogleMapPresentation extends JFrame {
 		double widthOfWindowDegree = (windowWidth / pixelsPerDegree) / 2;
 		double heightOfWindowDegree = (windowHeight / pixelsPerDegree) / 2;
 		
-		System.err.println("height: " + heightOfWindowDegree + " width: " + widthOfWindowDegree);
-		
 		GLatLng sw = new GLatLng(center.lat() - widthOfWindowDegree, center.lng() - heightOfWindowDegree);
 		GLatLng ne = new GLatLng(center.lat() + widthOfWindowDegree, center.lng() + heightOfWindowDegree);
 		
@@ -108,4 +107,13 @@ public class GoogleMapPresentation extends JFrame {
 	public TileLayer getTileLayer() {
 		return this.tileLayer;
 	}
+
+    public void runatest() {
+        System.err.println("Bounds for the view:");
+        System.err.println(this.getLatLngBounds());
+        System.err.println("Pixel for -122.09795150214593, 37.48584849785407:");
+        System.err.println(tileLayer.latLngToPixel(new Point2D.Double(-122.09795150214593, 37.48584849785407)));
+        System.err.println("LatLng for 0,0:");
+        System.err.println(tileLayer.pixelToLatLng(new Point(0,0)));
+    }
 }
