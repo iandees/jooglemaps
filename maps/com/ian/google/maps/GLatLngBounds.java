@@ -21,6 +21,14 @@ public class GLatLngBounds {
 	public GLatLng getSouthWest() {
 		return this.southWest;
 	}
+    
+    public GLatLng getNorthWest() {
+        return new GLatLng(this.northEast.lat(), this.southWest.lng());
+    }
+    
+    public GLatLng getSouthEast() {
+        return new GLatLng(this.southWest.lat(), this.northEast.lng());
+    }
 	
 	public GLatLng getCenter() {
 		return northEast.midpointTo(southWest);

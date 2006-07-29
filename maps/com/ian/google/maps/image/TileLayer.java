@@ -2,6 +2,7 @@ package com.ian.google.maps.image;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -31,6 +32,9 @@ public class TileLayer extends JPanel {
 
 	/** The parent map container. */
 	private GoogleMapPresentation parentWindow;
+    
+    /** The cache of images for this tile layer. */
+    private ImageCacheMap cache;
 	
 	/** The number of zoom levels for this tile layer. */
 	public static final int NUM_ZOOM_LEVELS = 18;
@@ -158,6 +162,7 @@ public class TileLayer extends JPanel {
 		this.setLayout(null);
 		this.baseUrl = base;
 		this.parentWindow = parent;
+        this.cache = new ImageCacheMap(this.baseUrl);
 	}
 
 	public void setBounds(int x, int y, int width, int height) {
@@ -179,14 +184,17 @@ public class TileLayer extends JPanel {
 		
 		for(int x = neTile.x; x < swTile.x; x++) {
 			for(int y = neTile.y; y < swTile.y; y++) {
-				
-				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom);
+				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
+                Point tileloc = latLngToPixel(new Point2D.Double(ll.x, ll.y));
+                ImageIcon l = cache.get(tileloc, zoom);
+                g.drawRect(tileloc.x, tileloc.y, 256, 256);
+				//System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
 		}
 		super.paintComponents(g);
 	}
 	
-	public GLatLng pixelToLatLng(Point pixelPoint) {
+	public Point2D.Double pixelToLatLng(Point pixelPoint) {
 		int zoom = 17-parentWindow.getZoom();
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
 		GLatLng sw = parentBounds.getSouthWest();
@@ -194,16 +202,16 @@ public class TileLayer extends JPanel {
 		double lat = sw.lat() + (pixelPoint.y / PIXELS_PER_LON_DEGREE[zoom]);
 		double lng = sw.lng() + (pixelPoint.x / PIXELS_PER_LON_DEGREE[zoom]);
 		
-		return new GLatLng(lat, lng);
+		return new Point2D.Double(lat, lng);
 	}
 	
-	public Point latLngToPixel(GLatLng mapPoint) {
+	public Point latLngToPixel(Point2D.Double mapPoint) {
 		int zoom = 17-parentWindow.getZoom();
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
-		GLatLng sw = parentBounds.getSouthWest();
+		GLatLng nw = parentBounds.getNorthWest();
 		
-		int x = (int) ((PIXELS_PER_LON_DEGREE[zoom] * mapPoint.lng()) - sw.lng());
-		int y = (int) ((PIXELS_PER_LON_DEGREE[zoom] * mapPoint.lat()) - sw.lat());
+		int x = (int) (mapPoint.x / (PIXELS_PER_LON_DEGREE[zoom]));
+		int y = (int) (mapPoint.y / (PIXELS_PER_LON_DEGREE[zoom]));
 		
 		return new Point(x, y);
 	}
