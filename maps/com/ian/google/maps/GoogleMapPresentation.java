@@ -63,9 +63,33 @@ public class GoogleMapPresentation extends JFrame {
 	public void setCenter(GLatLng center, int zoom) {
 		// Based on the center lat/lng given and the width and height of the
 		// window, calculate the LatLngBounds
-        this.zoomLevel = 17-zoom;
+        this.zoomLevel = zoom;
 		int windowWidth = getWidth();
 		int windowHeight = getHeight();
+        
+        // This is the center of the viewport in pixels, related to the top left corner of the world
+        int centerX = tileLayer.lngToX(center.lng());
+        int centerY = tileLayer.latToY(center.lat());
+        
+        // From the center of the view, move down to the left corner
+        int swX = centerX - (windowWidth / 2);
+        int swY = centerY - (windowHeight / 2);
+        
+        // Get the lat/lng for this point
+        double swLng = tileLayer.xToLng(swX);
+        double swLat = tileLayer.yToLat(swY);
+        GLatLng sw = new GLatLng(swLat, swLng);
+        
+        // From the center, now move north and to the east to get the right corner
+        int neX = centerX + (windowWidth / 2);
+        int neY = centerY + (windowHeight / 2);
+        
+        // Get the lat/lng for this point
+        double neLng = tileLayer.xToLng(neX);
+        double neLat = tileLayer.yToLat(neY);
+        GLatLng ne = new GLatLng(neLat, neLng);
+        
+        /*
 		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[this.getZoom()];
 		
 		double widthOfWindowDegree = (pixelsPerDegree / (windowWidth / 2));
@@ -73,7 +97,7 @@ public class GoogleMapPresentation extends JFrame {
 		
 		GLatLng sw = new GLatLng(center.lat() + (widthOfWindowDegree), center.lng() + (heightOfWindowDegree));
 		GLatLng ne = new GLatLng(center.lat() - (widthOfWindowDegree), center.lng() - (heightOfWindowDegree));
-		
+		*/
 		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
 
