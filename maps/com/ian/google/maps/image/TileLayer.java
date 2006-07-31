@@ -54,7 +54,7 @@ public class TileLayer extends JPanel {
 	static {
 
 		int c = TILE_SIZE;
-		for (int d = NUM_ZOOM_LEVELS; d >= 0; d--) {
+		for (int d = NUM_ZOOM_LEVELS; d >= 0; --d) {
 			PIXELS_PER_LON_DEGREE[d] = c / 360.0;
 			PIXELS_PER_LON_RADIAN[d] = c / TWO_PI;
 			double e = c / 2.0;
@@ -109,7 +109,7 @@ public class TileLayer extends JPanel {
 		double lat = -1;
 		double latHeight = 2;
 
-		int tilesAtThisZoom = 1 << (zoom);
+		int tilesAtThisZoom = 1 << (17-zoom);
 		lonWidth = 360.0 / tilesAtThisZoom;
 		lon = -180 + (x * lonWidth);
 		latHeight = -2.0 / tilesAtThisZoom;
@@ -157,8 +157,12 @@ public class TileLayer extends JPanel {
 		int zoom = this.parentWindow.getZoom();
 		
         // Get the numbers for tiles that are at each of our window's corners
-		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
-		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
+		Tiles swTiles = new Tiles(sw.lat(), sw.lng(), zoom);
+		Tiles neTiles = new Tiles(ne.lat(), ne.lng(), zoom);
+		Point swTile = swTiles.getTileCoord();
+		Point neTile = neTiles.getTileCoord();
+		//Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
+		//Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
 		
 		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 		
@@ -257,10 +261,10 @@ class Tiles {
 	// ...Constants...
 	private double PI = 3.1415926535;
 	private int tileSize = 256;
-	private double[] pixelsPerLonDegree = new double[18];
-	private double[] pixelsPerLonRadian = new double[18];
-	private double[] numTiles = new double[18];
-	private Point2D.Double[] bitmapOrigo = new Point2D.Double[18];
+	private double[] pixelsPerLonDegree = new double[19];
+	private double[] pixelsPerLonRadian = new double[19];
+	private double[] numTiles = new double[19];
+	private Point2D.Double[] bitmapOrigo = new Point2D.Double[19];
 	// Note: These variable names are based on the variables names found in the
 	//       Google maps.*.js code.
 	private static int c = 256;
@@ -272,7 +276,7 @@ class Tiles {
 		bc = 2*PI;
 		Wa = PI/180;
 	
-		for(int d = 17; d >= 0; --d) {
+		for(int d = 0; d <= 18; d++) {
   			pixelsPerLonDegree[d] = c/360;
   			pixelsPerLonRadian[d] = c/bc;
   			double e = c/2;
