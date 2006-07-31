@@ -53,7 +53,7 @@ public class GLatLng {
 	}
 	
 	public GLatLng midpointTo(GLatLng other) {
-		return new GLatLng((other.latitude-this.latitude)/2, (other.longitude-this.longitude)/2);
+		return new GLatLng((other.latitude+this.latitude)/2.0, (other.longitude+this.longitude)/2.0);
 	}
 
 	public String toString() {
