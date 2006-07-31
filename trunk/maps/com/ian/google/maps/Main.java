@@ -7,7 +7,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		GoogleMapPresentation presentation = new GoogleMapPresentation();
-		presentation.setCenter(new GLatLng(37.4419, -122.1419), 6);
+		presentation.setCenter(new GLatLng(37.4419, -122.1419), 13);
         presentation.runatest();
 		presentation.setVisible(true);
 	}
