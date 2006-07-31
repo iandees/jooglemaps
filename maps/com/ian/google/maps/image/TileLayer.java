@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 import com.ian.google.maps.GLatLng;
@@ -32,18 +33,18 @@ public class TileLayer extends JPanel {
 	 * An array, indexed by zoom level, of the number of pixels per longitudal
 	 * degree.
 	 */
-	public static double[] PIXELS_PER_LON_DEGREE = new double[NUM_ZOOM_LEVELS];
+	public static double[] PIXELS_PER_LON_DEGREE = new double[NUM_ZOOM_LEVELS+1];
 
 	/**
 	 * An Array, indexed by zoom level, of the number of pixels per longitudal
 	 * radian.
 	 */
-	public static double[] PIXELS_PER_LON_RADIAN = new double[NUM_ZOOM_LEVELS];
+	public static double[] PIXELS_PER_LON_RADIAN = new double[NUM_ZOOM_LEVELS+1];
 
 	/** An array, indexed by zoom level, of the number of tiles at a zoom level. */
-	public static double[] NUM_TILES = new double[NUM_ZOOM_LEVELS];
+	public static double[] NUM_TILES = new double[NUM_ZOOM_LEVELS+1];
 
-	public static Point2D.Double[] BITMAP_ORIGIN = new Point2D.Double[NUM_ZOOM_LEVELS];
+	public static Point2D.Double[] BITMAP_ORIGIN = new Point2D.Double[NUM_ZOOM_LEVELS+1];
 
 	private static double TWO_PI = 2.0 * Math.PI;
 
@@ -53,8 +54,8 @@ public class TileLayer extends JPanel {
 	static {
 
 		int c = TILE_SIZE;
-		for (int d = NUM_ZOOM_LEVELS - 1; d >= 0; --d) {
-			PIXELS_PER_LON_DEGREE[d] = c / 360;
+		for (int d = NUM_ZOOM_LEVELS; d >= 0; d--) {
+			PIXELS_PER_LON_DEGREE[d] = c / 360.0;
 			PIXELS_PER_LON_RADIAN[d] = c / TWO_PI;
 			double e = c / 2.0;
 			BITMAP_ORIGIN[d] = new Point2D.Double(e, e);
@@ -68,8 +69,8 @@ public class TileLayer extends JPanel {
 			double longitude, int zoomLevel) {
 		Point2D.Double d = new Point2D.Double(0, 0);
 
-		d.x = Math.floor(BITMAP_ORIGIN[17-zoomLevel].x + longitude
-				* PIXELS_PER_LON_DEGREE[17-zoomLevel]);
+		d.x = Math.floor(BITMAP_ORIGIN[zoomLevel].x + longitude
+				* PIXELS_PER_LON_DEGREE[zoomLevel]);
 		double e = Math.sin(latitude * RADIAN_PI);
 
 		if (e > 0.9999) {
@@ -80,9 +81,9 @@ public class TileLayer extends JPanel {
 			e = -0.9999;
 		}
 
-		d.y = Math.floor(BITMAP_ORIGIN[17-zoomLevel].y + 0.5
+		d.y = Math.floor(BITMAP_ORIGIN[zoomLevel].y + 0.5
 				* Math.log((1 + e) / (1 - e)) * -1
-				* (PIXELS_PER_LON_RADIAN[17-zoomLevel]));
+				* (PIXELS_PER_LON_RADIAN[zoomLevel]));
 		return d;
 	}
 
@@ -162,8 +163,8 @@ public class TileLayer extends JPanel {
 		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 		
         // For each of the tiles in between the corner tiles...
-		for(int x = swTile.x; x > neTile.x; x--) {
-			for(int y = swTile.y; y > neTile.y; y--) {
+		for(int x = swTile.x; x >= neTile.x; x--) {
+			for(int y = swTile.y+1; y >= neTile.y; y--) {
                 // Determine the tile's lat/long coordinate
 				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
                 // Determine where in the window that tile should go
@@ -174,9 +175,10 @@ public class TileLayer extends JPanel {
                 Point tileloc = new Point(swCornerX - tileCornerX, swCornerY - tileCornerY);
                 //Point tileloc = this.latLngToPixel(new Point2D.Double(ll.x, ll.y));
                 // Load the image from the cache
-                //ImageIcon l = cache.get(tileloc, zoom);
+                //ImageIcon l = cache.get(tileloc, x, y, zoom);
                 // Draw a rectangle over where the image is supposed to be
                 g.drawRect(tileloc.x, tileloc.y, 256, 256);
+                //g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
 				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
 		}
@@ -184,7 +186,6 @@ public class TileLayer extends JPanel {
 	}
 	
 	public Point latLngToPixel(Point2D.Double mapPoint) {
-		int zoom = parentWindow.getZoom();
 		GLatLngBounds parentBounds = this.parentWindow.getLatLngBounds();
 		GLatLng sw = parentBounds.getSouthWest();
 		

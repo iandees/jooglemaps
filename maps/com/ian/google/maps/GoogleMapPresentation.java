@@ -121,7 +121,7 @@ public class GoogleMapPresentation extends JFrame {
 	}
 
 	public int getZoom() {
-		return 18-this.zoomLevel;
+		return this.zoomLevel;
 	}
 	
 	public void setZoom(int zoom) {

@@ -22,14 +22,15 @@ public class ImageCacheMap extends HashMap {
         
     }*/
 
-    public ImageIcon get(Point tileloc, int zoom) {
+    public ImageIcon get(Point tileloc, int x, int y, int zoom) {
         TileImage im = new TileImage(tileloc,zoom);
         if(this.containsKey(im)) {
             ImageIcon image = (ImageIcon) this.get(im);
             return image;
         } else {
             try {
-                URL u = new URL(baseURL + "x="+tileloc.x+"&y="+tileloc.y+"&zoom="+zoom);
+                URL u = new URL(baseURL + "x="+x+"&y="+y+"&zoom="+(18-zoom));
+                System.err.println(u);
                 ImageIcon i = new ImageIcon(u);
                 this.put(im, i);
                 return i;
