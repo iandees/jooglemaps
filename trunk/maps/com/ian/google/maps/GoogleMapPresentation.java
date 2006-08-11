@@ -45,8 +45,6 @@ public class GoogleMapPresentation extends JFrame {
 		});
 		
 		Container c = this.getContentPane();
-        tileLayer.setBounds(0,0,2048,2048);
-		//tileLayer.setBounds(0, 0, 512, 512);
 		c.add(tileLayer);
         
         
@@ -92,7 +90,7 @@ public class GoogleMapPresentation extends JFrame {
         
         // From the center of the view, move down to the left corner
         int swX = centerX - (windowWidth / 2);
-        int swY = centerY + (windowHeight / 2);
+        int swY = centerY - (windowHeight / 2);
         
         // Get the lat/lng for this point
         double swLng = tileLayer.xToLng(swX);
@@ -101,7 +99,7 @@ public class GoogleMapPresentation extends JFrame {
         
         // From the center, now move north and to the east to get the right corner
         int neX = centerX + (windowWidth / 2);
-        int neY = centerY - (windowHeight / 2);
+        int neY = centerY + (windowHeight / 2);
         
         // Get the lat/lng for this point
         double neLng = tileLayer.xToLng(neX);

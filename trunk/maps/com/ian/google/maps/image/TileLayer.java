@@ -157,18 +157,18 @@ public class TileLayer extends JPanel {
 		int zoom = this.parentWindow.getZoom();
 		
         // Get the numbers for tiles that are at each of our window's corners
-		Tiles swTiles = new Tiles(sw.lat(), sw.lng(), zoom);
-		Tiles neTiles = new Tiles(ne.lat(), ne.lng(), zoom);
-		Point swTile = swTiles.getTileCoord();
-		Point neTile = neTiles.getTileCoord();
-		//Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
-		//Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
+		//Tiles swTiles = new Tiles(sw.lat(), sw.lng(), zoom);
+		//Tiles neTiles = new Tiles(ne.lat(), ne.lng(), zoom);
+		//Point swTile = swTiles.getTileCoord();
+		//Point neTile = neTiles.getTileCoord();
+		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
+		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
 		
 		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 		
         // For each of the tiles in between the corner tiles...
-		for(int x = swTile.x; x >= neTile.x; x--) {
-			for(int y = swTile.y+1; y >= neTile.y; y--) {
+		for(int x = swTile.x; x > neTile.x; x--) {
+			for(int y = swTile.y; y > neTile.y; y--) {
                 // Determine the tile's lat/long coordinate
 				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
                 // Determine where in the window that tile should go
