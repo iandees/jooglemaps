@@ -119,12 +119,12 @@ public class TileLayer extends JPanel {
 		// projection note that in fact the coordinates go from about -85 to +85
 		// not -90 to 90!
 		latHeight += lat;
-		latHeight = (2 * Math.atan(Math.exp(Math.PI * latHeight)))
-				- (Math.PI / 2);
-		latHeight *= (180 / Math.PI);
+		latHeight = (2.0 * Math.atan(Math.exp(Math.PI * latHeight)))
+				- (Math.PI / 2.0);
+		latHeight *= (180.0 / Math.PI);
 
-		lat = (2 * Math.atan(Math.exp(Math.PI * lat))) - (Math.PI / 2);
-		lat *= (180 / Math.PI);
+		lat = (2.0 * Math.atan(Math.exp(Math.PI * lat))) - (Math.PI / 2.0);
+		lat *= (180.0 / Math.PI);
 
 		latHeight -= lat;
 
@@ -161,32 +161,31 @@ public class TileLayer extends JPanel {
 		//Tiles neTiles = new Tiles(ne.lat(), ne.lng(), zoom);
 		//Point swTile = swTiles.getTileCoord();
 		//Point neTile = neTiles.getTileCoord();
-		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), zoom);
-		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), zoom);
+		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), 17-zoom);
+		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), 17-zoom);
 		
 		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
-		
+
+        // Determine where in the window that tile should go
+		int swCornerX = lngToX(center.lng());
+		int swCornerY = latToY(center.lat());
         // For each of the tiles in between the corner tiles...
-		for(int x = swTile.x; x > neTile.x; x--) {
-			for(int y = swTile.y; y > neTile.y; y--) {
+		for(int x = swTile.x-1; x < neTile.x+1; x++) {
+			for(int y = swTile.y+1; y > neTile.y-1; y--) {
                 // Determine the tile's lat/long coordinate
-				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
-                // Determine where in the window that tile should go
-				int swCornerX = lngToX(center.lng());
-				int swCornerY = latToY(center.lat());
+				Rectangle2D.Double ll = getTileLatLong(x, y, 17-zoom);
 				int tileCornerX = lngToX(ll.x);
 				int tileCornerY = latToY(ll.y);
                 Point tileloc = new Point(swCornerX - tileCornerX, swCornerY - tileCornerY);
-                //Point tileloc = this.latLngToPixel(new Point2D.Double(ll.x, ll.y));
                 // Load the image from the cache
-                //ImageIcon l = cache.get(tileloc, x, y, zoom);
+                ImageIcon l = cache.get(tileloc, x, y, 17-zoom);
                 // Draw a rectangle over where the image is supposed to be
                 g.drawRect(tileloc.x, tileloc.y, 256, 256);
-                //g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
+                g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
 				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
 		}
-		super.paintComponents(g);
+		super.paint(g);
 	}
 	
 	public Point latLngToPixel(Point2D.Double mapPoint) {
@@ -205,7 +204,7 @@ public class TileLayer extends JPanel {
 		double radius = circumference / (2.0 * Math.PI);
     	double longitude = Math.toRadians(longitudeDegrees);
     	int falsenorthing = (circumference / 2);
-        return (int) (radius * longitude) + falsenorthing;
+        return (int) ((radius * longitude) + falsenorthing) + BITMAP_ORIGIN[17-this.parentWindow.getZoom()].x;
     }
     
     public double xToLng(int x) {
@@ -235,7 +234,7 @@ public class TileLayer extends JPanel {
                 Math.log( (1.0 + Math.sin(latitude)) /
                           (1.0 - Math.sin(latitude)) );
         int falseeasting = -1 * (circumference / 2);
-        return (int) y + falseeasting;
+        return (int) y + falseeasting + BITMAP_ORIGIN[17-this.parentWindow.getZoom()].y;
     }
     
     public double yToLat(int y) {
@@ -247,133 +246,4 @@ public class TileLayer extends JPanel {
 		return Math.toDegrees(latitude);
         
     }
-}
-
-class Tiles {
-
-	// The Point (x,y) for this tile
-	private Point p;
-	// The coord (lat,lon) for this tile
-	private Point2D.Double co;
-	// Zoom level for this tile
-	private int z;
-
-	// ...Constants...
-	private double PI = 3.1415926535;
-	private int tileSize = 256;
-	private double[] pixelsPerLonDegree = new double[19];
-	private double[] pixelsPerLonRadian = new double[19];
-	private double[] numTiles = new double[19];
-	private Point2D.Double[] bitmapOrigo = new Point2D.Double[19];
-	// Note: These variable names are based on the variables names found in the
-	//       Google maps.*.js code.
-	private static int c = 256;
-	private double bc;
-	private double Wa;
-
-	// Fill in the constants array
-	public void fillinconstants() {
-		bc = 2*PI;
-		Wa = PI/180;
-	
-		for(int d = 0; d <= 18; d++) {
-  			pixelsPerLonDegree[d] = c/360;
-  			pixelsPerLonRadian[d] = c/bc;
-  			double e = c/2;
-  			bitmapOrigo[d] = new Point2D.Double(e,e);
-  			numTiles[d] = c/256;
-  			c *= 2;
-		}
-	}
-
-	public Tiles(double latitude, double longitude, int zoomLevel) {
-		fillinconstants();
-		z = zoomLevel;
-		p = getTileCoordinate(latitude, longitude, zoomLevel);
-		co = getLatLong(latitude, longitude, zoomLevel);
-	}
-	
-	public Point getTileCoord() {
-		return this.p;
-	}
-
-	public Point2D.Double getTileLatLong() {
-		return this.co;
-	}
-
-	public char getKeyholeString() {
-		char s;
-		double myX = p.x;
-		double myY = p.y;
-		
-		for(int i = 17; i > z; i--) {
-			double rx = myX % 2;
-			myX = myX/2;
-			double ry = myY % 2;
-			myY = (myY / 2);
-			//s = this.getKeyholeDirection(rx, ry).$s;
-			s = getKeyholeDirection(rx, ry);
-			
-			// pas clair
-		}
-		//return 't'.$s;
-		return 't';
-	}
-
-	public char getKeyholeDirection(double x, double y) {
-		if(x == 1) {
-			if(y == 1) {
-				return 's';
-			} else if(y == 0) {
-				return 'r';
-			}
-		} else if(x == 0) {
-			if(y == 1) {
-				return 't';
-			} else if(y == 0) {
-				return 'q';
-			}
-		}
-		return ' ';
-	}
-		
-	public Point getBitmapCoordinate(double a, double b, int c) {
-  		Point d = new Point(0,0);
-
-  		d.x =(int) (bitmapOrigo[c].x + b*pixelsPerLonDegree[c]);
-  		double e = Math.sin(a*Wa);
-
-  		if(e > 0.9999) {
-    		e = 0.9999;
-  		}
-
-  		if(e < -0.9999) {
-    		e = -0.9999;
-  		}
-
-  		d.y = (int) (bitmapOrigo[c].y + 0.5*Math.log((1+e)/(1-e))*-1*(pixelsPerLonRadian[c]));
-  		return d;
-	}
-
-	public Point getTileCoordinate(double a, double b, int c) {
-  		Point d = getBitmapCoordinate(a, b, c);
-  		d.x = (d.x / tileSize);
-  		d.y = (d.y / tileSize);
-
-  		return d;
-	}
-
-	public Point2D.Double getLatLong(double a, double b, int c) {
-		Point2D.Double d = new Point2D.Double(0, 0);
-		Point e = getBitmapCoordinate(a, b, c);
-		a = e.x;
-		b = e.y;
-
-		d.x = ((a - bitmapOrigo[c].x)/pixelsPerLonDegree[c]);
-		double et = (b - bitmapOrigo[c].y) / (-1*pixelsPerLonRadian[c]);
-		d.y = ((2 * Math.atan(Math.exp(et)) - PI/2)/Wa);
-		return d;
-	}
-	
-
 }

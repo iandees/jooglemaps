@@ -1,6 +1,7 @@
 package com.ian.google.maps.image;
 
 import java.awt.Image;
+import java.awt.MediaTracker;
 import java.awt.Point;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +30,10 @@ public class ImageCacheMap extends HashMap {
             return image;
         } else {
             try {
-                URL u = new URL(baseURL + "x="+x+"&y="+y+"&zoom="+(18-zoom));
-                System.err.println(u);
+                URL u = new URL(baseURL + "x="+x+"&y="+y+"&zoom="+(zoom));
+                System.err.print(u);
                 ImageIcon i = new ImageIcon(u);
+                System.err.println(" -- " + i.getImageLoadStatus());
                 this.put(im, i);
                 return i;
             } catch (MalformedURLException e) {
