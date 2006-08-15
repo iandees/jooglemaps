@@ -2,6 +2,7 @@ package com.ian.google.maps;
 
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -15,8 +16,7 @@ import com.ian.google.maps.image.TileLayer;
 
 public class GoogleMapPresentation extends JFrame {
 
-	private TileLayer tileLayer = new TileLayer(this,
-			"http://mt3.google.com/mt?n=404&v=w2.17&");
+	private TileLayer tileLayer = null;
 
 	private MapMouseListener mouseListener = new MapMouseListener(this);
 
@@ -44,9 +44,11 @@ public class GoogleMapPresentation extends JFrame {
 			}
 		});
 		
+		tileLayer = new TileLayer(this,
+		"http://mt3.google.com/mt?n=404&v=w2.25&");
+		
 		Container c = this.getContentPane();
 		c.add(tileLayer);
-        
         
 	}
 
@@ -72,7 +74,7 @@ public class GoogleMapPresentation extends JFrame {
 
 	public void redrawMap() {
 		// TODO - only support for one tile layer right now
-		this.tileLayer.repaint();
+		this.repaint();
 	}
 
 	public void setCenter(GLatLng center, int zoom) {
@@ -85,8 +87,8 @@ public class GoogleMapPresentation extends JFrame {
 		System.err.println("Width: " + windowWidth + " Height: " + windowHeight);
         
         // This is the center of the viewport in pixels, related to the top left corner of the world
-        int centerX = tileLayer.lngToX(center.lng()) + tileLayer.BITMAP_ORIGIN[zoom].x;
-        int centerY = tileLayer.latToY(center.lat()) + tileLayer.BITMAP_ORIGIN[zoom].y;
+        int centerX = tileLayer.lngToX(center.lng());
+        int centerY = tileLayer.latToY(center.lat());
         
         // From the center of the view, move down to the left corner
         int swX = centerX + (windowWidth / 2);//;
@@ -106,15 +108,6 @@ public class GoogleMapPresentation extends JFrame {
         double neLat = tileLayer.yToLat(neY);
         GLatLng ne = new GLatLng(neLat, neLng);
         
-        /*
-		double pixelsPerDegree = TileLayer.PIXELS_PER_LON_DEGREE[this.getZoom()];
-		
-		double widthOfWindowDegree = (pixelsPerDegree / (windowWidth / 2));
-		double heightOfWindowDegree = (pixelsPerDegree / (windowHeight / 2));
-		
-		GLatLng sw = new GLatLng(center.lat() + (widthOfWindowDegree), center.lng() + (heightOfWindowDegree));
-		GLatLng ne = new GLatLng(center.lat() - (widthOfWindowDegree), center.lng() - (heightOfWindowDegree));
-		*/
 		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
 
@@ -137,11 +130,13 @@ public class GoogleMapPresentation extends JFrame {
                 + TileLayer.getTileLatLong(647, 1584, 5));
         System.err.println("Tile x, y, z for -123.134 37.649 z=5 = "
                 + TileLayer.getTileCoordinate(37.64903402157866, -123.134765625, 5));
-        
+
+        System.err.println("----------------");
         System.err.println("Northwest for bounds   : " + this.getLatLngBounds().getNorthWest());
         System.err.println("Northeast for bounds ->: " + this.getLatLngBounds().getNorthEast());
         System.err.println("Southeast for bounds   : " + this.getLatLngBounds().getSouthEast());
         System.err.println("Southwest for bounds ->: " + this.getLatLngBounds().getSouthWest());
+        System.err.println("----------------");
         System.err.println("Pixel for -122.09795150214593, 37.48584849785407:");
         System.err.println(tileLayer.latLngToPixel(new Point2D.Double(-122.09795150214593, 37.48584849785407)));
         //System.err.println("LatLng for 0,0:");
@@ -155,8 +150,15 @@ public class GoogleMapPresentation extends JFrame {
     public void moveToPixels(int x, int y) {
         // Determine how many degrees lat and lng the change represents
         //GLatLng l = tileLayer.pixelToLatLng(new Point(x,y));
-        System.err.println("dx: " + l.lng() + " dy: " + l.lat());
+        System.err.println("dx: " + x + " dy: " + y);
         
         // Move the view pane by that much
     }
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		this.tileLayer.paint(g);
+	}
+    
 }
