@@ -164,7 +164,7 @@ public class TileLayer extends JPanel {
 		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), 17-zoom);
 		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), 17-zoom);
 		
-		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
+		//System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 
         // Determine where in the window that tile should go
 		int swCornerX = lngToX(center.lng());
@@ -182,7 +182,7 @@ public class TileLayer extends JPanel {
                 // Draw a rectangle over where the image is supposed to be
                 //g.drawRect(tileloc.x, tileloc.y, 256, 256);
                 g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
-				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
+				//System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
 		}
 		super.paint(g);
