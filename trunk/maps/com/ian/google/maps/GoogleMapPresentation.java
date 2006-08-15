@@ -7,6 +7,8 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 
 import javax.swing.JFrame;
@@ -16,13 +18,17 @@ import com.ian.google.maps.image.TileLayer;
 
 public class GoogleMapPresentation extends JFrame {
 
+	private static final int MAX_ZOOM = 17;
+
+	private static final int MIN_ZOOM = 0;
+
 	private TileLayer tileLayer = null;
 
 	private MapMouseListener mouseListener = new MapMouseListener(this);
 
 	private GLatLngBounds viewBounds = null;
 	
-	private GLatLng centerLatLng = null;
+	private Point centerPoint = null;
 	
 	private int zoomLevel = 17;
 
@@ -43,6 +49,18 @@ public class GoogleMapPresentation extends JFrame {
 				resized();
 			}
 		});
+		this.addKeyListener(new KeyAdapter() {
+
+			public void keyPressed(KeyEvent e) {
+				System.err.println(e.getKeyChar());
+				if(e.getKeyChar() == '=') {
+					increaseZoom();
+				} else if(e.getKeyChar() == '-') {
+					decreaseZoom();
+				} else {
+				}
+			}
+		});
 		
 		tileLayer = new TileLayer(this,
 		"http://mt3.google.com/mt?n=404&v=w2.25&");
@@ -52,9 +70,31 @@ public class GoogleMapPresentation extends JFrame {
         
 	}
 
+	public void decreaseZoom() {
+		int modZoom = (17-this.getZoom() + 1);
+		if(modZoom > MAX_ZOOM) {
+			return;
+		} else if(modZoom < MIN_ZOOM) {
+			return;
+		} else {
+			this.setZoom(modZoom);
+		}
+	}
+
+	public void increaseZoom() {
+		int modZoom = (17-this.getZoom() - 1);
+		if(modZoom > MAX_ZOOM) {
+			return;
+		} else if(modZoom < MIN_ZOOM) {
+			return;
+		} else {
+			this.setZoom(modZoom);
+		}
+	}
+
 	protected void resized() {
-		if (this.centerLatLng != null) {
-			this.setCenter(this.centerLatLng, this.zoomLevel);
+		if (this.centerPoint != null) {
+			this.setCenter(this.centerPoint, this.zoomLevel);
 		}
 	}
 
@@ -76,23 +116,25 @@ public class GoogleMapPresentation extends JFrame {
 		// TODO - only support for one tile layer right now
 		this.repaint();
 	}
+	
+	public void setCenter(Point center) {
+		setCenter(center, 17-getZoom());
+	}
 
-	public void setCenter(GLatLng center, int zoom) {
+	public void setCenter(Point center, int zoom) {
 		// Based on the center lat/lng given and the width and height of the
 		// window, calculate the LatLngBounds
         this.zoomLevel = zoom;
-        this.centerLatLng = center;
+        this.centerPoint = center;
 		int windowWidth = getWidth();
 		int windowHeight = getHeight();
-		System.err.println("Width: " + windowWidth + " Height: " + windowHeight);
-        
-        // This is the center of the viewport in pixels, related to the top left corner of the world
-        int centerX = tileLayer.lngToX(center.lng());
-        int centerY = tileLayer.latToY(center.lat());
-        
+		
+		int centerX = center.x;
+        int centerY = center.y;
+		
         // From the center of the view, move down to the left corner
-        int swX = centerX + (windowWidth / 2);//;
-        int swY = centerY + (windowHeight / 2);//;
+        int swX = centerX + (windowWidth / 2);
+        int swY = centerY + (windowHeight / 2);
         
         // Get the lat/lng for this point
         double swLng = tileLayer.xToLng(swX);
@@ -110,6 +152,15 @@ public class GoogleMapPresentation extends JFrame {
         
 		this.setLatLngBounds(new GLatLngBounds(sw, ne));
 	}
+	
+	public void setCenter(GLatLng center, int zoom) {
+		this.zoomLevel = zoom;
+		// This is the center of the viewport in pixels, related to the top left corner of the world
+        int centerX = tileLayer.lngToX(center.lng());
+        int centerY = tileLayer.latToY(center.lat());
+        
+        setCenter(new Point(centerX, centerY), zoom);
+	}
 
 	public int getZoom() {
 		return 17-this.zoomLevel;
@@ -117,6 +168,7 @@ public class GoogleMapPresentation extends JFrame {
 	
 	public void setZoom(int zoom) {
 		this.zoomLevel = zoom;
+		this.redrawMap();
 		// TODO - we have to update the map here
 	}
 
@@ -148,14 +200,13 @@ public class GoogleMapPresentation extends JFrame {
     }
 
     public void moveToPixels(int x, int y) {
-        // Determine how many degrees lat and lng the change represents
-        //GLatLng l = tileLayer.pixelToLatLng(new Point(x,y));
-        System.err.println("dx: " + x + " dy: " + y);
-        
-        // Move the view pane by that much
+        setCenter(new Point(x, y));
     }
 
-	@Override
+	public Point getCenter() {
+		return this.centerPoint;
+	}
+
 	public void paint(Graphics g) {
 		super.paint(g);
 		this.tileLayer.paint(g);

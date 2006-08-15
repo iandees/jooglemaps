@@ -25,14 +25,14 @@ public class ImageCacheMap extends WeakHashMap<TileImage, ImageIcon> {
         TileImage im = new TileImage(new Point(x,y), zoom);
         ImageIcon image = null;
         if((image = (ImageIcon) this.get(im)) != null) {
-        	System.err.println("Already had image in cache.");
+        	//System.err.println("Already had image in cache.");
             return image;
         } else {
             try {
                 URL u = new URL(baseURL + "x="+x+"&y="+y+"&zoom="+(zoom));
-                System.err.print(u);
+                //System.err.print(u);
                 ImageIcon i = new ImageIcon(u);
-                System.err.println(" -- " + i.getImageLoadStatus());
+                //System.err.println(" -- " + i.getImageLoadStatus());
                 this.put(im, i);
                 return i;
             } catch (MalformedURLException e) {

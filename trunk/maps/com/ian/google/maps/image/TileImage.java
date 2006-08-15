@@ -34,7 +34,6 @@ public class TileImage {
     }
 
 	public int hashCode() {
-		System.err.println("coords: " + coordinates);
 		return coordinates.x*coordinates.y*zoom;
 	}
     

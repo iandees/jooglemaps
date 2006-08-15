@@ -13,7 +13,7 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	
 	private Point initialClick = null;
 
-    private GLatLngBounds initialBounds;
+    private Point initialCenter = null;
 	
 	public MapMouseListener(GoogleMapPresentation presentation) {
 		this.pres = presentation;
@@ -33,16 +33,18 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 
 	public void mousePressed(MouseEvent e) {
 		initialClick = new Point(e.getX(), e.getY());
+		initialCenter = this.pres.getCenter();
 	}
 
 	public void mouseReleased(MouseEvent e) {
 		initialClick = null;
+		initialCenter = null;
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		int dX = (e.getX()-initialClick.x);
-		int dY = (e.getY()-initialClick.y);
-        pres.moveToPixels(e.getX(), e.getY());
+		int X = initialCenter.x + (e.getX()-initialClick.x);
+		int Y = initialCenter.y + (e.getY()-initialClick.y);
+        pres.moveToPixels(X, Y);
 		//Point newOrigin = new Point(originalOrigin.x + dX, originalOrigin.y + dY);
 		//this.pres.setOrigin(newOrigin.x, newOrigin.y);
 	}
