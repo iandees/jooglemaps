@@ -85,12 +85,12 @@ public class GoogleMapPresentation extends JFrame {
 		System.err.println("Width: " + windowWidth + " Height: " + windowHeight);
         
         // This is the center of the viewport in pixels, related to the top left corner of the world
-        int centerX = tileLayer.lngToX(center.lng());
-        int centerY = tileLayer.latToY(center.lat());
+        int centerX = tileLayer.lngToX(center.lng()) + tileLayer.BITMAP_ORIGIN[zoom].x;
+        int centerY = tileLayer.latToY(center.lat()) + tileLayer.BITMAP_ORIGIN[zoom].y;
         
         // From the center of the view, move down to the left corner
-        int swX = centerX - (windowWidth / 2);
-        int swY = centerY - (windowHeight / 2);
+        int swX = centerX + (windowWidth / 2);//;
+        int swY = centerY + (windowHeight / 2);//;
         
         // Get the lat/lng for this point
         double swLng = tileLayer.xToLng(swX);
@@ -98,8 +98,8 @@ public class GoogleMapPresentation extends JFrame {
         GLatLng sw = new GLatLng(swLat, swLng);
         
         // From the center, now move north and to the east to get the right corner
-        int neX = centerX + (windowWidth / 2);
-        int neY = centerY + (windowHeight / 2);
+        int neX = centerX - (windowWidth / 2);
+        int neY = centerY - (windowHeight / 2);
         
         // Get the lat/lng for this point
         double neLng = tileLayer.xToLng(neX);
@@ -119,7 +119,7 @@ public class GoogleMapPresentation extends JFrame {
 	}
 
 	public int getZoom() {
-		return this.zoomLevel;
+		return 17-this.zoomLevel;
 	}
 	
 	public void setZoom(int zoom) {
@@ -154,7 +154,7 @@ public class GoogleMapPresentation extends JFrame {
 
     public void moveToPixels(int x, int y) {
         // Determine how many degrees lat and lng the change represents
-        GLatLng l = tileLayer.pixelToLatLng(new Point(x,y));
+        //GLatLng l = tileLayer.pixelToLatLng(new Point(x,y));
         System.err.println("dx: " + l.lng() + " dy: " + l.lat());
         
         // Move the view pane by that much

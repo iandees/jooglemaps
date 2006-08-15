@@ -24,7 +24,7 @@ public class TileLayer extends JPanel {
     private ImageCacheMap cache;
 	
 	/** The number of zoom levels for this tile layer. */
-	public static final int NUM_ZOOM_LEVELS = 18;
+	public static final int NUM_ZOOM_LEVELS = 17;
 
 	/** The width and height of one of this layer's tiles. */
 	public static final int TILE_SIZE = 256;
@@ -44,7 +44,7 @@ public class TileLayer extends JPanel {
 	/** An array, indexed by zoom level, of the number of tiles at a zoom level. */
 	public static double[] NUM_TILES = new double[NUM_ZOOM_LEVELS+1];
 
-	public static Point2D.Double[] BITMAP_ORIGIN = new Point2D.Double[NUM_ZOOM_LEVELS+1];
+	public static Point[] BITMAP_ORIGIN = new Point[NUM_ZOOM_LEVELS+1];
 
 	private static double TWO_PI = 2.0 * Math.PI;
 
@@ -57,8 +57,8 @@ public class TileLayer extends JPanel {
 		for (int d = NUM_ZOOM_LEVELS; d >= 0; --d) {
 			PIXELS_PER_LON_DEGREE[d] = c / 360.0;
 			PIXELS_PER_LON_RADIAN[d] = c / TWO_PI;
-			double e = c / 2.0;
-			BITMAP_ORIGIN[d] = new Point2D.Double(e, e);
+			int e = c / 2;
+			BITMAP_ORIGIN[d] = new Point(e, e);
 			NUM_TILES[d] = c / TILE_SIZE;
 			c *= 2.0;
 		}
@@ -100,7 +100,7 @@ public class TileLayer extends JPanel {
 	 * returns a Rectangle2D with x = lon, y = lat, width=lonSpan,
 	 * height=latSpan for an x,y,zoom as used by google.
 	 */
-	public static Rectangle2D.Double getTileLatLong(int x, int y, int zoom) {
+	public static Rectangle2D.Double getTileLatLong(int longitude, int latitude, int zoom) {
 		double lon = -180; // x
 		double lonWidth = 360; // width 360
 
@@ -109,11 +109,11 @@ public class TileLayer extends JPanel {
 		double lat = -1;
 		double latHeight = 2;
 
-		int tilesAtThisZoom = 1 << (17-zoom);
+		int tilesAtThisZoom = 1 << (NUM_ZOOM_LEVELS-zoom);
 		lonWidth = 360.0 / tilesAtThisZoom;
-		lon = -180 + (x * lonWidth);
+		lon = -180 + (longitude * lonWidth);
 		latHeight = -2.0 / tilesAtThisZoom;
-		lat = 1 + (y * latHeight);
+		lat = 1 + (latitude * latHeight);
 
 		// convert lat and latHeight to degrees in a transverse mercator
 		// projection note that in fact the coordinates go from about -85 to +85
