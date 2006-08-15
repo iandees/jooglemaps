@@ -1,15 +1,13 @@
 package com.ian.google.maps.image;
 
-import java.awt.Image;
-import java.awt.MediaTracker;
 import java.awt.Point;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashMap;
+import java.util.WeakHashMap;
 
 import javax.swing.ImageIcon;
 
-public class ImageCacheMap extends HashMap {
+public class ImageCacheMap extends WeakHashMap<TileImage, ImageIcon> {
 
     private String baseURL = "";
     
@@ -24,9 +22,10 @@ public class ImageCacheMap extends HashMap {
     }*/
 
     public ImageIcon get(Point tileloc, int x, int y, int zoom) {
-        TileImage im = new TileImage(tileloc,zoom);
-        if(this.containsKey(im)) {
-            ImageIcon image = (ImageIcon) this.get(im);
+        TileImage im = new TileImage(new Point(x,y), zoom);
+        ImageIcon image = null;
+        if((image = (ImageIcon) this.get(im)) != null) {
+        	System.err.println("Already had image in cache.");
             return image;
         } else {
             try {

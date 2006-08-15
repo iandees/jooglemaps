@@ -100,7 +100,7 @@ public class TileLayer extends JPanel {
 	 * returns a Rectangle2D with x = lon, y = lat, width=lonSpan,
 	 * height=latSpan for an x,y,zoom as used by google.
 	 */
-	public static Rectangle2D.Double getTileLatLong(int longitude, int latitude, int zoom) {
+	public static Rectangle2D.Double getTileLatLong(int tileX, int tileY, int zoom) {
 		double lon = -180; // x
 		double lonWidth = 360; // width 360
 
@@ -109,11 +109,11 @@ public class TileLayer extends JPanel {
 		double lat = -1;
 		double latHeight = 2;
 
-		int tilesAtThisZoom = 1 << (NUM_ZOOM_LEVELS-zoom);
+		int tilesAtThisZoom = 1 << zoom;
 		lonWidth = 360.0 / tilesAtThisZoom;
-		lon = -180 + (longitude * lonWidth);
-		latHeight = -2.0 / tilesAtThisZoom;
-		lat = 1 + (latitude * latHeight);
+		lon = -180 + (tileX * lonWidth);
+		latHeight = 2.0 / tilesAtThisZoom;
+		lat = ((tilesAtThisZoom/2 - tileY-1) * latHeight);
 
 		// convert lat and latHeight to degrees in a transverse mercator
 		// projection note that in fact the coordinates go from about -85 to +85
@@ -170,17 +170,17 @@ public class TileLayer extends JPanel {
 		int swCornerX = lngToX(center.lng());
 		int swCornerY = latToY(center.lat());
         // For each of the tiles in between the corner tiles...
-		for(int x = swTile.x-1; x < neTile.x+1; x++) {
-			for(int y = swTile.y+1; y > neTile.y-1; y--) {
+		for(int y = swTile.y+1; y > neTile.y-1; y--) {
+			for(int x = swTile.x-1; x < neTile.x+1; x++) {
                 // Determine the tile's lat/long coordinate
-				Rectangle2D.Double ll = getTileLatLong(x, y, 17-zoom);
+				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
 				int tileCornerX = lngToX(ll.x);
 				int tileCornerY = latToY(ll.y);
                 Point tileloc = new Point(swCornerX - tileCornerX, swCornerY - tileCornerY);
                 // Load the image from the cache
                 ImageIcon l = cache.get(tileloc, x, y, 17-zoom);
                 // Draw a rectangle over where the image is supposed to be
-                g.drawRect(tileloc.x, tileloc.y, 256, 256);
+                //g.drawRect(tileloc.x, tileloc.y, 256, 256);
                 g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
 				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
