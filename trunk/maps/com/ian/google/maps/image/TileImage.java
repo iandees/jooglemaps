@@ -32,5 +32,10 @@ public class TileImage {
     public String toString() {
         return "Tile ("+this.coordinates+") @ zoom " + this.zoom;
     }
+
+	public int hashCode() {
+		System.err.println("coords: " + coordinates);
+		return coordinates.x*coordinates.y*zoom;
+	}
     
 }
