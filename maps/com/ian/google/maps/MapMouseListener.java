@@ -20,8 +20,15 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	}
 
 	public void mouseClicked(MouseEvent e) {
-		//System.err.println("Click at: " + pres.getTileLayer().pixelToLatLng(e.getPoint()));
-	}
+        if (e.getClickCount() == 2) {
+            Point o = pres.getOrigin();
+            o.translate(-e.getX(), -e.getY());
+            System.err.println("Double click at: " + o.x
+                    + " " + o.y);
+            pres.setCenter(o);
+
+        }
+    }
 
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub

@@ -206,6 +206,10 @@ public class GoogleMapPresentation extends JFrame {
 	public Point getCenter() {
 		return this.centerPoint;
 	}
+    
+    public Point getOrigin() {
+        return new Point(this.centerPoint.x - getWidth()/2, this.centerPoint.y - getHeight()/2);
+    }
 
 	public void paint(Graphics g) {
 		super.paint(g);
