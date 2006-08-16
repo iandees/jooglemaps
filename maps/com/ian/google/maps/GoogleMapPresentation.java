@@ -50,9 +50,7 @@ public class GoogleMapPresentation extends JFrame {
 			}
 		});
 		this.addKeyListener(new KeyAdapter() {
-
 			public void keyPressed(KeyEvent e) {
-				System.err.println(e.getKeyChar());
 				if(e.getKeyChar() == '=') {
 					increaseZoom();
 				} else if(e.getKeyChar() == '-') {
@@ -104,11 +102,6 @@ public class GoogleMapPresentation extends JFrame {
 
 	public void setLatLngBounds(GLatLngBounds bounds) {
 		this.viewBounds = bounds;
-		this.redrawMap();
-	}
-	
-	public void transformBounds(GLatLng delta) {
-		this.viewBounds.transform(delta);
 		this.redrawMap();
 	}
 
@@ -167,9 +160,7 @@ public class GoogleMapPresentation extends JFrame {
 	}
 	
 	public void setZoom(int zoom) {
-		this.zoomLevel = zoom;
-		this.redrawMap();
-		// TODO - we have to update the map here
+		this.setCenter(this.getLatLngBounds().getCenter(), zoom);
 	}
 
 	public TileLayer getTileLayer() {

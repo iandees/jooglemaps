@@ -46,6 +46,7 @@ public class MapMouseListener implements MouseListener, MouseMotionListener {
 	public void mouseReleased(MouseEvent e) {
 		initialClick = null;
 		initialCenter = null;
+		System.err.println("Center: " + pres.getCenter());
 	}
 
 	public void mouseDragged(MouseEvent e) {
