@@ -48,41 +48,32 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
     }
 
     public void mouseClicked(MouseEvent e) {
-        System.err.println("Click: " + e.getX() + " " + e.getY());
     }
 
     public void mouseEntered(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
     }
 
     public void mouseExited(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
     }
 
     public void mousePressed(MouseEvent e) {
         this.drawing = true;
         this.point1 = e.getPoint();
-        System.err.println("Pressed");
     }
 
     public void mouseReleased(MouseEvent e) {
         this.drawing = false;
         this.point2 = e.getPoint();
-        System.err.println("Released");
         this.draws.add(this.currentlyDrawing);
     }
 
     public void mouseDragged(MouseEvent e) {
         if(this.drawing) {
-            this.currentlyDrawing = new Line(point1, e.getPoint());
+            this.currentlyDrawing = new Line(point1, e.getPoint(), 5);
             this.repaint();
         }
     }
 
     public void mouseMoved(MouseEvent e) {
-        // TODO Auto-generated method stub
-        
     }
 }
