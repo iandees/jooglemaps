@@ -16,10 +16,15 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.border.BevelBorder;
 
 import com.mapki.netdraw.network.DrawConnector;
 
@@ -33,7 +38,11 @@ public class DrawingGui {
     private DrawConnector connector;
 
     private JFrame frame;
+    private JPanel statusBarPanel;
+    private JLabel statusBar;
     private DrawPane drawPane;
+
+    private JMenuItem selectedToolMenuItem;
     
     public DrawingGui(DrawConnector connector) {
         this.connector = connector;
@@ -43,6 +52,7 @@ public class DrawingGui {
 
     private void init() {
         this.frame = new JFrame(APPLICATION_TITLE);
+        this.frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 endGracefully();
@@ -52,6 +62,14 @@ public class DrawingGui {
         Container c = frame.getContentPane();
         c.setLayout(new BorderLayout());
         frame.setSize(1000, 800);
+        
+        // Add the status bar
+        this.statusBarPanel = new JPanel();
+        this.statusBar = new JLabel("Hello World");
+        this.statusBarPanel.setLayout(new BorderLayout());
+        this.statusBarPanel.add(statusBar, BorderLayout.CENTER);
+        this.statusBarPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
+        c.add(statusBarPanel, BorderLayout.SOUTH);
 
         // Add the drawing area
         drawPane = new DrawPane(connector);
@@ -60,7 +78,26 @@ public class DrawingGui {
         // Add the menu bar
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
-        JMenuItem menuItem = new JMenuItem("Quit");
+        JMenuItem menuItem = new JMenuItem("Host...");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                doHost();
+            }
+        });
+        fileMenu.add(menuItem);
+        
+        menuItem = new JMenuItem("Join...");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String address = JOptionPane.showInputDialog("Enter the address for the drawer you're connecting to:");
+                doJoin(address);
+            }
+        });
+        fileMenu.add(menuItem);
+        
+        fileMenu.addSeparator();
+        
+        menuItem = new JMenuItem("Quit");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 endGracefully();
@@ -84,8 +121,8 @@ public class DrawingGui {
         Iterator<String> tools = drawPane.getSupportedTools();
         while(tools.hasNext()) {
             String tool = tools.next();
-            JMenuItem item;
-            item = new JMenuItem(tool);
+            JRadioButtonMenuItem item;
+            item = new JRadioButtonMenuItem(tool, false);
             item.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     chooseTool(e.getSource());
@@ -100,10 +137,24 @@ public class DrawingGui {
         
     }
 
+    protected void doHost() {
+        connector.startHosting();
+    }
+
+    protected void doJoin(String address) {
+        connector.connectTo(address);
+    }
+
     protected void chooseTool(Object source) {
-        if(source instanceof JMenuItem) {
-            JMenuItem sourceMenuItem = (JMenuItem) source;
+        if(source instanceof JRadioButtonMenuItem) {
+            JRadioButtonMenuItem sourceMenuItem = (JRadioButtonMenuItem) source;
             drawPane.setTool(sourceMenuItem.getText());
+            
+            if (this.selectedToolMenuItem != null) {
+                this.selectedToolMenuItem.setSelected(false);
+            }
+            this.selectedToolMenuItem = sourceMenuItem;
+            this.selectedToolMenuItem.setSelected(true);
         }
     }
 
@@ -111,8 +162,27 @@ public class DrawingGui {
         drawPane.doUndo();
     }
 
-    protected void endGracefully() {
+    protected boolean endGracefully() {
+        int result = JOptionPane.showConfirmDialog(this.frame, "Are you sure you want to close your drawing session?");
+        
+        if(result != JOptionPane.OK_OPTION) {
+            return false;
+        }
+        
+        if(connector.isHosting()) {
+            connector.stopHosting();
+        }
+        
+        if(connector.isConnected()) {
+            connector.closeConnections();
+        }
+        
         System.exit(0);
+        return true;
+    }
+    
+    public void setStatusText(String text) {
+        this.statusBar.setText(text);
     }
 
     public void start() {

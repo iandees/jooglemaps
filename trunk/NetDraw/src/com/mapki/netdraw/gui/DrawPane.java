@@ -5,8 +5,6 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,6 +13,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 
 import com.mapki.netdraw.gui.shapes.Line;
+import com.mapki.netdraw.gui.shapes.Oval;
 import com.mapki.netdraw.gui.shapes.Rectangle;
 import com.mapki.netdraw.gui.shapes.Resistor;
 import com.mapki.netdraw.network.DrawConnector;
@@ -40,6 +39,7 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
         this.toolChoice = Line.class;
         this.supportedShapes.put("Rectangle", Rectangle.class);
         this.supportedShapes.put("Resistor", Resistor.class);
+        this.supportedShapes.put("Oval", Oval.class);
         
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
