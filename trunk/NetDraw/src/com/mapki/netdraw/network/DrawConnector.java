@@ -3,6 +3,8 @@
  */
 package com.mapki.netdraw.network;
 
+import com.mapki.netdraw.gui.NetDrawable;
+
 /**
  * @author Ian Dees
  *
@@ -15,4 +17,5 @@ public class DrawConnector {
         this.pool = new DrawersPool();
         this.clients = new ClientMaintainer();
     }
+
 }
