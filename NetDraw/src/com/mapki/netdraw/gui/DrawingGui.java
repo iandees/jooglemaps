@@ -3,10 +3,15 @@
  */
 package com.mapki.netdraw.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -35,7 +40,14 @@ public class DrawingGui {
 
     private void init() {
         this.frame = new JFrame(APPLICATION_TITLE);
+        frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                endGracefully();
+            }
+        });
+        
         Container c = frame.getContentPane();
+        c.setLayout(new BorderLayout());
         frame.setSize(1000, 800);
 
         // Add the menu bar
@@ -43,11 +55,9 @@ public class DrawingGui {
         JMenu fileMenu = new JMenu("File");
         JMenuItem menuItem = new JMenuItem("Quit");
         menuItem.addActionListener(new ActionListener() {
-        
             public void actionPerformed(ActionEvent e) {
                 endGracefully();
             }
-        
         });
         fileMenu.add(menuItem);
         menuBar.add(fileMenu);
@@ -55,8 +65,8 @@ public class DrawingGui {
         frame.setJMenuBar(menuBar);
         
         // Add the drawing area
-        drawPane = new DrawPane();
-        c.add(drawPane);
+        drawPane = new DrawPane(connector);
+        c.add(drawPane, BorderLayout.CENTER);
     }
 
     protected void endGracefully() {
