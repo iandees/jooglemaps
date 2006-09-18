@@ -48,7 +48,22 @@ public class Oval implements NetDrawable {
     }
 
     public void setPoint2(Point point2) {
-        this.se = point2;
+        if(point2.x < this.nw.x) {
+            if(point2.y < this.nw.y) {
+                this.se = this.nw;
+                this.nw = point2;
+            } else {
+                this.se = new Point(this.nw.x, point2.y);
+                this.nw = new Point(point2.x, this.nw.y);
+            }
+        } else {
+            if(point2.y < this.nw.y) {
+                this.se = new Point(point2.x, this.nw.y);
+                this.nw = new Point(this.nw.x, point2.y);
+            } else {
+                this.se = point2;
+            }
+        }
     }
 
     public void setWeight(int weight) {
