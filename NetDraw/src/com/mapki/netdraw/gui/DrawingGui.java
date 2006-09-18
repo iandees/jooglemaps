@@ -138,6 +138,11 @@ public class DrawingGui {
     }
 
     protected void doHost() {
+        if(connector.hasDrawers() == false) {
+            JOptionPane.showMessageDialog(this.frame, "You need to set up your local user before you can host.");
+            return;
+        }
+        
         connector.startHosting();
     }
 
@@ -163,10 +168,12 @@ public class DrawingGui {
     }
 
     protected boolean endGracefully() {
-        int result = JOptionPane.showConfirmDialog(this.frame, "Are you sure you want to close your drawing session?");
-        
-        if(result != JOptionPane.OK_OPTION) {
-            return false;
+        if(connector.isHosting() || connector.isConnected()) {
+            int result = JOptionPane.showConfirmDialog(this.frame, "Are you sure you want to close your drawing session?");
+            
+            if(result != JOptionPane.OK_OPTION) {
+                return false;
+            }
         }
         
         if(connector.isHosting()) {
