@@ -100,6 +100,7 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
     }
 
     public void mouseMoved(MouseEvent e) {
+        this.connector.mouseAt(e.getX(), e.getY());
     }
 
     public void doUndo() {

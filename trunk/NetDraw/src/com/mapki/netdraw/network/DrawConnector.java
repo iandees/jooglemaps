@@ -29,13 +29,15 @@ public class DrawConnector {
     }
 
     public void startHosting() {
-        // TODO Auto-generated method stub
-        
+        this.clients.startListening();
     }
 
     public boolean isHosting() {
-        // TODO Auto-generated method stub
-        return false;
+        if(this.clients.hasClients()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void stopHosting() {
@@ -51,6 +53,15 @@ public class DrawConnector {
     public void closeConnections() {
         // TODO Auto-generated method stub
         
+    }
+
+    public void mouseAt(int x, int y) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public boolean hasDrawers() {
+        return this.pool.getDrawers().hasNext();
     }
 
 }
