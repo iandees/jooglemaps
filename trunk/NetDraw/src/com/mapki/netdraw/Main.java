@@ -1,6 +1,6 @@
 package com.mapki.netdraw;
 
-import com.mapki.netdraw.gui.DrawPane;
+import com.mapki.netdraw.gui.DrawingGui;
 import com.mapki.netdraw.network.DrawConnector;
 
 public class Main {
@@ -10,7 +10,7 @@ public class Main {
      */
     public static void main(String[] args) {
         DrawConnector connector = new DrawConnector();
-        DrawPane gui = new DrawPane(connector);
+        DrawingGui gui = new DrawingGui(connector);
         gui.start();
     }
 
