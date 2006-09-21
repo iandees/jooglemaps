@@ -9,8 +9,9 @@ import java.awt.Stroke;
 
 import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
+import com.mapki.netdraw.gui.NetDrawableInterface;
 
-public class Rectangle implements NetDrawable {
+public class Rectangle extends NetDrawable implements NetDrawableInterface {
     private Point nw;
     private Point se;
     private int weight;
@@ -20,6 +21,7 @@ public class Rectangle implements NetDrawable {
         this.nw = new Point();
         this.se = new Point();
         this.weight = 0;
+        this.setStroke(new BasicStroke(1.0f));
     }
     
     public Rectangle(Color color, Point point1, Point point2, int weight) {
@@ -30,14 +32,14 @@ public class Rectangle implements NetDrawable {
     }
 
     public String serialize() {
-        return "RECT{"+nw.x+","+nw.y+","+se.x+","+se.y+"} WEIGHT{"+this.weight+"}\n";
+        return "RECT{"+nw.x+","+nw.y+","+se.x+","+se.y+"} WEIGHT{"+this.weight+"}";
     }
 
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         
         Stroke orig = g2d.getStroke();
-        g2d.setStroke(new BasicStroke(this.weight));
+        g2d.setStroke(this.stroke);
         g2d.drawRect(nw.x, nw.y, Math.abs(se.x-nw.x), Math.abs(se.y-nw.y));
         g2d.setStroke(orig);
         
@@ -45,10 +47,6 @@ public class Rectangle implements NetDrawable {
 
     public String getName() {
         return "Rectangle";
-    }
-
-    public void setPoint1(Point point1) {
-        this.nw = point1;
     }
 
     public void setPoint2(Point point2) {
@@ -68,18 +66,5 @@ public class Rectangle implements NetDrawable {
                 this.se = point2;
             }
         }
-    }
-
-    public void setWeight(int weight) {
-        this.weight = weight;
-    }
-
-
-    public Color getColor() {
-        return this.color;
-    }
-    
-    public void setColor(Color newColor) {
-        this.color = newColor;
     }
 }

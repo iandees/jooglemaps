@@ -10,8 +10,9 @@ import java.awt.geom.Point2D;
 
 import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
+import com.mapki.netdraw.gui.NetDrawableInterface;
 
-public class Resistor implements NetDrawable {
+public class Resistor extends NetDrawable implements NetDrawableInterface {
     private int x1;
     private int y1;
     private int x2;
@@ -25,6 +26,7 @@ public class Resistor implements NetDrawable {
         this.y1 = 0;
         this.y2 = 0;
         this.weight = 0;
+        this.setStroke(new BasicStroke(1.0f));
     }
     
     public Resistor(Color owner, Point point1, Point point2, int weight) {
@@ -37,14 +39,14 @@ public class Resistor implements NetDrawable {
     }
 
     public String serialize() {
-        return "RESISTOR{"+x1+","+y1+","+x2+","+y2+"} WEIGHT{"+this.weight+"}\n";
+        return "RESISTOR{"+x1+","+y1+","+x2+","+y2+"} WEIGHT{"+this.weight+"}";
     }
 
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
         
         Stroke orig = g2d.getStroke();
-        g2d.setStroke(new BasicStroke(this.weight));
+        g2d.setStroke(this.stroke);
         double distance = Point.distance(x1, y1, x2, y2);
         double slope = 0;
         try {
@@ -63,28 +65,5 @@ public class Resistor implements NetDrawable {
 
     public String getName() {
         return "Resistor";
-    }
-
-    public void setPoint1(Point point1) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void setPoint2(Point point) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public void setWeight(int weight) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    public Color getColor() {
-        return this.color;
-    }
-    
-    public void setColor(Color newColor) {
-        this.color = newColor;
     }
 }

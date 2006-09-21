@@ -3,10 +3,9 @@ package com.mapki.netdraw.gui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Stroke;
 
-import com.mapki.netdraw.Drawer;
-
-public interface NetDrawable {
+public interface NetDrawableInterface {
 
     public void paint(Graphics g);
 
@@ -18,9 +17,12 @@ public interface NetDrawable {
 
     public void setPoint2(Point point);
 
-    public void setWeight(int weight);
-
     public Color getColor();
 
     public void setColor(Color color);
+
+    public Stroke getStroke();
+    
+    public void setStroke(Stroke stroke);
+    
 }

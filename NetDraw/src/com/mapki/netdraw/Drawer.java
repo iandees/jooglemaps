@@ -1,6 +1,8 @@
 package com.mapki.netdraw;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Stroke;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -10,13 +12,15 @@ public class Drawer {
     private Color drawColor;
     private String name;
     private InetAddress address;
+    private Stroke stroke;
     
     public Drawer() throws UnknownHostException {
-        this(Color.BLACK, "me", InetAddress.getLocalHost());
+        this(Color.BLACK, new BasicStroke(1.0f), "me", InetAddress.getLocalHost());
     }
     
-    public Drawer(Color drawColor, String name, InetAddress address) {
+    public Drawer(Color drawColor, Stroke drawStroke, String name, InetAddress address) {
         this.drawColor = drawColor;
+        this.stroke = drawStroke;
         this.name = name;
         this.address = address;
     }
@@ -42,5 +46,13 @@ public class Drawer {
 
     public void setColor(Color c) {
         this.drawColor = c;
+    }
+
+    public Stroke getDrawStroke() {
+        return this.stroke;
+    }
+    
+    public void setDrawStroke(int weight) {
+        this.stroke = new BasicStroke(weight);
     }
 }
