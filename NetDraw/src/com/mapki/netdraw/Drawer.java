@@ -12,13 +12,13 @@ public class Drawer {
     private Color drawColor;
     private String name;
     private InetAddress address;
-    private Stroke stroke;
+    private int stroke;
     
     public Drawer() throws UnknownHostException {
-        this(Color.BLACK, new BasicStroke(1.0f), "me", InetAddress.getLocalHost());
+        this(Color.BLACK, 1, "me", InetAddress.getLocalHost());
     }
     
-    public Drawer(Color drawColor, Stroke drawStroke, String name, InetAddress address) {
+    public Drawer(Color drawColor, int drawStroke, String name, InetAddress address) {
         this.drawColor = drawColor;
         this.stroke = drawStroke;
         this.name = name;
@@ -49,10 +49,14 @@ public class Drawer {
     }
 
     public Stroke getDrawStroke() {
+        return new BasicStroke(this.stroke);
+    }
+    
+    public int getDrawWeight() {
         return this.stroke;
     }
     
     public void setDrawStroke(int weight) {
-        this.stroke = new BasicStroke(weight);
+        this.stroke = weight;
     }
 }

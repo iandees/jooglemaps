@@ -104,7 +104,7 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
                 currentlyDrawing.setColor(connector.getSelf().getDrawColor());
                 currentlyDrawing.setPoint1(point1);
                 currentlyDrawing.setPoint2(e.getPoint());
-                currentlyDrawing.setStroke(connector.getSelf().getDrawStroke());
+                currentlyDrawing.setWeight(connector.getSelf().getDrawWeight());
                 this.repaint();
             } catch (InstantiationException e1) {
                 // TODO Auto-generated catch block
