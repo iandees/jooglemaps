@@ -4,6 +4,7 @@
 package com.mapki.netdraw.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.JColorChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -129,8 +131,17 @@ public class DrawingGui {
                 }
             });
             toolsMenu.add(item);
-            menuBar.add(toolsMenu);
         }
+        toolsMenu.addSeparator();
+        menuItem = new JMenuItem("Select Color...");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Color c = JColorChooser.showDialog(frame, "Choose your pen color", Color.black);
+                connector.setColor(connector.getSelf(), c);
+            }
+        });
+        toolsMenu.add(menuItem);
+        menuBar.add(toolsMenu);
         
         frame.setJMenuBar(menuBar);
         

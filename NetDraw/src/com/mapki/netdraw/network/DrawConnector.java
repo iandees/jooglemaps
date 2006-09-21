@@ -3,6 +3,10 @@
  */
 package com.mapki.netdraw.network;
 
+import java.awt.Color;
+
+import com.mapki.netdraw.Drawer;
+
 
 /**
  * @author Ian Dees
@@ -64,4 +68,12 @@ public class DrawConnector {
         return this.pool.getDrawers().hasNext();
     }
 
+    public Drawer getSelf() {
+        return this.pool.getSelf();
+    }
+
+    public void setColor(Drawer self, Color c) {
+        // TODO Hook to tell people that my color has been changed here
+        this.pool.setColor(self, c);
+    }
 }

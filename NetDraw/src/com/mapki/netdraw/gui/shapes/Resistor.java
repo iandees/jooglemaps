@@ -1,12 +1,14 @@
 package com.mapki.netdraw.gui.shapes;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
+import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
 
 public class Resistor implements NetDrawable {
@@ -15,6 +17,7 @@ public class Resistor implements NetDrawable {
     private int x2;
     private int y2;
     private int weight;
+    private Color color;
     
     public Resistor() {
         this.x1 = 0;
@@ -24,7 +27,8 @@ public class Resistor implements NetDrawable {
         this.weight = 0;
     }
     
-    public Resistor(Point point1, Point point2, int weight) {
+    public Resistor(Color owner, Point point1, Point point2, int weight) {
+        this.color = owner;
         this.x1 = point1.x;
         this.y1 = point1.y;
         this.x2 = point2.x;
@@ -76,4 +80,11 @@ public class Resistor implements NetDrawable {
         
     }
 
+    public Color getColor() {
+        return this.color;
+    }
+    
+    public void setColor(Color newColor) {
+        this.color = newColor;
+    }
 }

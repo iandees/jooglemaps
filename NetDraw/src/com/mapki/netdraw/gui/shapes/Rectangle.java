@@ -1,17 +1,20 @@
 package com.mapki.netdraw.gui.shapes;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 
+import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
 
 public class Rectangle implements NetDrawable {
     private Point nw;
     private Point se;
     private int weight;
+    private Color color;
     
     public Rectangle() {
         this.nw = new Point();
@@ -19,7 +22,8 @@ public class Rectangle implements NetDrawable {
         this.weight = 0;
     }
     
-    public Rectangle(Point point1, Point point2, int weight) {
+    public Rectangle(Color color, Point point1, Point point2, int weight) {
+        this.color = color;
         setPoint1(point1);
         setPoint2(point2);
         this.weight = weight;
@@ -70,4 +74,12 @@ public class Rectangle implements NetDrawable {
         this.weight = weight;
     }
 
+
+    public Color getColor() {
+        return this.color;
+    }
+    
+    public void setColor(Color newColor) {
+        this.color = newColor;
+    }
 }
