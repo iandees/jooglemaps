@@ -6,7 +6,7 @@ import java.awt.Point;
 import java.awt.Stroke;
 
 public interface NetDrawableInterface {
-
+    
     public void paint(Graphics g);
 
     public String serialize();
