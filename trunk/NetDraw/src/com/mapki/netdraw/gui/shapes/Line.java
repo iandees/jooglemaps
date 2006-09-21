@@ -1,17 +1,20 @@
 package com.mapki.netdraw.gui.shapes;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 
+import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
 
 public class Line implements NetDrawable {
     private Point nw;
     private Point se;
     private int weight;
+    private Color color;
     
     public Line() {
         this.nw = new Point();
@@ -53,6 +56,14 @@ public class Line implements NetDrawable {
 
     public void setWeight(int weight) {
         this.weight = weight;
+    }
+
+    public Color getColor() {
+        return this.color;
+    }
+
+    public void setColor(Color newColor) {
+        this.color = newColor;
     }
 
 }

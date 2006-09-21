@@ -2,7 +2,7 @@ package com.mapki.netdraw;
 
 import java.awt.Color;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.mapki.netdraw.network.DrawerSocket;
 
@@ -10,6 +10,10 @@ public class Drawer {
     private Color drawColor;
     private String name;
     private InetAddress address;
+    
+    public Drawer() throws UnknownHostException {
+        this(Color.BLACK, "me", InetAddress.getLocalHost());
+    }
     
     public Drawer(Color drawColor, String name, InetAddress address) {
         this.drawColor = drawColor;
@@ -34,5 +38,9 @@ public class Drawer {
     
     public String getName() {
         return name;
+    }
+
+    public void setColor(Color c) {
+        this.drawColor = c;
     }
 }

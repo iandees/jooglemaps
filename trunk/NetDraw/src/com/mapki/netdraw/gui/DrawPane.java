@@ -1,5 +1,6 @@
 package com.mapki.netdraw.gui;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseEvent;
@@ -51,12 +52,18 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
         Enumeration<NetDrawable> drawEnum = this.draws.elements();
         
         if(drawing) {
+            Color pColor = g.getColor();
+            g.setColor(currentlyDrawing.getColor());
             currentlyDrawing.paint(g);
+            g.setColor(pColor);
         }
         
         while(drawEnum.hasMoreElements()) {
             NetDrawable d = drawEnum.nextElement();
+            Color pColor = g.getColor();
+            g.setColor(d.getColor());
             d.paint(g);
+            g.setColor(pColor);
         }
         
     }
@@ -85,6 +92,7 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
         if(this.drawing) {
             try {
                 this.currentlyDrawing = (NetDrawable) toolChoice.newInstance();
+                currentlyDrawing.setColor(connector.getSelf().getDrawColor());
                 currentlyDrawing.setPoint1(point1);
                 currentlyDrawing.setPoint2(e.getPoint());
                 currentlyDrawing.setWeight(1);

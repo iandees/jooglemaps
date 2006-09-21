@@ -1,17 +1,20 @@
 package com.mapki.netdraw.gui.shapes;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Stroke;
 
+import com.mapki.netdraw.Drawer;
 import com.mapki.netdraw.gui.NetDrawable;
 
 public class Oval implements NetDrawable {
     private Point nw;
     private Point se;
     private int weight;
+    private Color color;
     
     public Oval() {
         this.nw = new Point();
@@ -19,7 +22,8 @@ public class Oval implements NetDrawable {
         this.weight = 0;
     }
     
-    public Oval(Point point1, Point point2, int weight) {
+    public Oval(Color owner, Point point1, Point point2, int weight) {
+        this.color = owner;
         this.nw = point1;
         this.se = point2;
         this.weight = weight;
@@ -70,4 +74,11 @@ public class Oval implements NetDrawable {
         this.weight = weight;
     }
 
+    public Color getColor() {
+        return this.color;
+    }
+    
+    public void setColor(Color newColor) {
+        this.color = newColor;
+    }
 }
