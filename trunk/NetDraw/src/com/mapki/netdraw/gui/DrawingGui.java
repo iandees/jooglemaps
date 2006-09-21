@@ -3,6 +3,7 @@
  */
 package com.mapki.netdraw.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -141,11 +142,32 @@ public class DrawingGui {
             }
         });
         toolsMenu.add(menuItem);
+        menuItem = new JMenuItem("Select Stroke...");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String sStroke = JOptionPane.showInputDialog(frame, "Enter a number for your line pen width:");
+                connector.setWeight(connector.getSelf(), Integer.parseInt(sStroke));
+            }
+        });
+        toolsMenu.add(menuItem);
+        
+        toolsMenu.addSeparator();
+        menuItem = new JMenuItem("Dump board");
+        menuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dumpBoard();   
+            }
+        });
+        toolsMenu.add(menuItem);
         menuBar.add(toolsMenu);
         
         frame.setJMenuBar(menuBar);
         
         
+    }
+
+    protected void dumpBoard() {
+        this.drawPane.dumpBoard();
     }
 
     protected void doHost() {

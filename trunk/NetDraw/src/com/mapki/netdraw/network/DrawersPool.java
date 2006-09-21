@@ -1,5 +1,6 @@
 package com.mapki.netdraw.network;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -44,5 +45,9 @@ public class DrawersPool {
 
     public void setColor(Drawer user, Color c) {
         ((Drawer)(this.pool.get(user.getAddress()))).setColor(c);
+    }
+
+    public void setStroke(Drawer user, int weight) {
+        ((Drawer)(this.pool.get(user.getAddress()))).setDrawStroke(weight);
     }
 }

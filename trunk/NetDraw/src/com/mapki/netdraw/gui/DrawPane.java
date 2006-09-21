@@ -2,7 +2,9 @@ package com.mapki.netdraw.gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -49,23 +51,30 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
     public void paint(Graphics g) {
         super.paint(g);
         
+        Graphics2D g2d = (Graphics2D) g;
+        
         Enumeration<NetDrawable> drawEnum = this.draws.elements();
         
         if(drawing) {
-            Color pColor = g.getColor();
-            g.setColor(currentlyDrawing.getColor());
-            currentlyDrawing.paint(g);
-            g.setColor(pColor);
+            Color pColor = g2d.getColor();
+            g2d.setColor(currentlyDrawing.getColor());
+            Stroke pStroke = g2d.getStroke();
+            g2d.setStroke(currentlyDrawing.getStroke());
+            currentlyDrawing.paint(g2d);
+            g2d.setColor(pColor);
+            g2d.setStroke(pStroke);
         }
         
         while(drawEnum.hasMoreElements()) {
             NetDrawable d = drawEnum.nextElement();
-            Color pColor = g.getColor();
-            g.setColor(d.getColor());
-            d.paint(g);
-            g.setColor(pColor);
+            Color pColor = g2d.getColor();
+            Stroke pStroke = g2d.getStroke();
+            g2d.setColor(d.getColor());
+            g2d.setStroke(d.getStroke());
+            d.paint(g2d);
+            g2d.setColor(pColor);
+            g2d.setStroke(pStroke);
         }
-        
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -95,7 +104,7 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
                 currentlyDrawing.setColor(connector.getSelf().getDrawColor());
                 currentlyDrawing.setPoint1(point1);
                 currentlyDrawing.setPoint2(e.getPoint());
-                currentlyDrawing.setWeight(1);
+                currentlyDrawing.setStroke(connector.getSelf().getDrawStroke());
                 this.repaint();
             } catch (InstantiationException e1) {
                 // TODO Auto-generated catch block
@@ -125,5 +134,14 @@ public class DrawPane extends JPanel implements MouseListener, MouseMotionListen
     
     public void setTool(String string) {
         this.toolChoice = supportedShapes.get(string);
+    }
+    
+    public void dumpBoard() {
+        Enumeration<NetDrawable> drawEnum = this.draws.elements();
+        
+        while(drawEnum.hasMoreElements()) {
+            NetDrawable draw = drawEnum.nextElement();
+            System.err.println(draw.serialize());
+        }
     }
 }

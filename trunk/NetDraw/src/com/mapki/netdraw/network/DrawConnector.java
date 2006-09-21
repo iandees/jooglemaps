@@ -3,6 +3,7 @@
  */
 package com.mapki.netdraw.network;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 
 import com.mapki.netdraw.Drawer;
@@ -75,5 +76,9 @@ public class DrawConnector {
     public void setColor(Drawer self, Color c) {
         // TODO Hook to tell people that my color has been changed here
         this.pool.setColor(self, c);
+    }
+
+    public void setWeight(Drawer self, int weight) {
+        this.pool.setStroke(self, weight);
     }
 }
