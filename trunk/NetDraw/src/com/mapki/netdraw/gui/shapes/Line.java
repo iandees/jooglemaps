@@ -9,15 +9,6 @@ import com.mapki.netdraw.gui.NetDrawable;
 import com.mapki.netdraw.gui.NetDrawableInterface;
 
 public class Line extends NetDrawable implements NetDrawableInterface {
-    
-    public Line() {
-        super();
-    }
-    
-    public Line(Point point1, Point point2) {
-        this.nw = point1;
-        this.se = point2;
-    }
 
     public String serialize() {
         return "LINE{"+nw.x+","+nw.y+","+se.x+","+se.y+"} WEIGHT{"+this.weight+"}";

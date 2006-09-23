@@ -12,25 +12,7 @@ import com.mapki.netdraw.gui.NetDrawable;
 import com.mapki.netdraw.gui.NetDrawableInterface;
 
 public class Rectangle extends NetDrawable implements NetDrawableInterface {
-    private Point nw;
-    private Point se;
-    private int weight;
-    private Color color;
     
-    public Rectangle() {
-        this.nw = new Point();
-        this.se = new Point();
-        this.weight = 0;
-        this.setStroke(new BasicStroke(1.0f));
-    }
-    
-    public Rectangle(Color color, Point point1, Point point2, int weight) {
-        this.color = color;
-        setPoint1(point1);
-        setPoint2(point2);
-        this.weight = weight;
-    }
-
     public String serialize() {
         return "RECT{"+nw.x+","+nw.y+","+se.x+","+se.y+"} WEIGHT{"+this.weight+"}";
     }
