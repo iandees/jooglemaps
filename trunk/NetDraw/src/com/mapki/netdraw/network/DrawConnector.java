@@ -5,6 +5,9 @@ package com.mapki.netdraw.network;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import com.mapki.netdraw.Drawer;
 
@@ -30,7 +33,13 @@ public class DrawConnector {
     }
 
     public void connectTo(String address) {
-        
+        try {
+            InetAddress addrToConnect = InetAddress.getByName(address);
+            this.clients.connectTo(addrToConnect);
+        } catch (UnknownHostException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public void startHosting() {
@@ -61,7 +70,6 @@ public class DrawConnector {
     }
 
     public void mouseAt(int x, int y) {
-        // TODO Auto-generated method stub
         
     }
 
