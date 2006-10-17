@@ -118,4 +118,19 @@ public class SudokuGame {
         c.toggle(i-1);
     }
 
+    /**
+     * @param n
+     * @param row
+     * @param col
+     * @return
+     */
+    public boolean cellHasOption(short n, int row, int col) {
+        Cell c = this.board.getCell(col, row);
+        if(c.isNumberSelected(n)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 }
