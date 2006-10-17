@@ -81,17 +81,19 @@ public class SudokuPanel extends JPanel {
      */
     public void highlightOptions(short n) {
         this.higlightedOption = n;
-        
-        for (int i = 0; i < cellWidth; i++) {
-            for (int j = 0; j < cellHeight; j++) {
-                if(game.cellHasOption((short) (n-1), i+1, j+1)) {
-                    cells[i][j].setBackground(HIGHLIGHT_COLOR);
-                    cells[i][j].repaint();
-                }
-                
-                if(game.chosenNumber(i+1, j+1) == n) {
-                    cells[i][j].setBackground(HIGHLIGHT_COLOR);
-                    cells[i][j].repaint();
+
+        if (higlightedOption < 1) {
+            return;
+        } else {
+            for (int i = 0; i < cellWidth; i++) {
+                for (int j = 0; j < cellHeight; j++) {
+                    if (game.cellHasOption((short) (n - 1), i + 1, j + 1) || game.chosenNumber(i + 1, j + 1) == n) {
+                        cells[i][j].setBackground(HIGHLIGHT_COLOR);
+                        cells[i][j].repaint();
+                    } else {
+                        cells[i][j].setBackground(NORMAL_COLOR);
+                        cells[i][j].repaint();
+                    }
                 }
             }
         }
