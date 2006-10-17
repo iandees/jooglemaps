@@ -99,7 +99,9 @@ public class SudokuBoard extends JFrame {
     }
 
     /**
-     * @param i
+     * Toggles the selected cell's option.
+     * 
+     * @param i The option to toggle.
      */
     protected void toggleSelectedCellOption(int i) {
         game.toggleSelectedCellOption(i);
@@ -107,7 +109,7 @@ public class SudokuBoard extends JFrame {
     }
 
     /**
-     * 
+     * Makes the board's parts visible.
      */
     public void start() {
         this.sPanel.start();
@@ -116,14 +118,14 @@ public class SudokuBoard extends JFrame {
     }
 
     /**
-     * @param n
+     * @param n Highlights all cells that have <code>n</code> selected in some way (as an option or as the "big number").
      */
     public void highlightOptions(short n) {
         sPanel.highlightOptions(n);
     }
 
     /**
-     * 
+     * Removes all highlighted cells.
      */
     public void highlightNone() {
         sPanel.highlightNone();

@@ -36,15 +36,7 @@ public class SudokuPanel extends JPanel {
         this.cellWidth = width;
         init();
     }
-    
-//    public Dimension getMinimumSize() {
-//        return new Dimension(512, 512);
-//    }
-//    
-//    public Dimension getPreferredSize() {
-//        return getMinimumSize();
-//    }
-    
+
     private void init() {
         this.setLayout(new GridLayout(this.cellHeight, this.cellWidth));
         
@@ -58,6 +50,9 @@ public class SudokuPanel extends JPanel {
         selectCell(1,1);
     }
     
+    /**
+     * Sets all of the panel's parts visible.
+     */
     public void start() {
         for (int i = 0; i < cellWidth; i++) {
             for (int j = 0; j < cellHeight; j++) {
@@ -68,8 +63,8 @@ public class SudokuPanel extends JPanel {
     }
 
     /**
-     * @param row
-     * @param col
+     * @param row The row of the cell to select.
+     * @param col The column of the cell to select.
      */
     public void selectCell(int row, int col) {
         game.selectCell(row, col);
@@ -77,7 +72,11 @@ public class SudokuPanel extends JPanel {
     }
 
     /**
+     * Highlights all of the cells that have the specified option selected or have the
+     * specified number as a "big number".
+     * 
      * @param n
+     *            The option to highlight.
      */
     public void highlightOptions(short n) {
         this.higlightedOption = n;
@@ -100,7 +99,7 @@ public class SudokuPanel extends JPanel {
     }
 
     /**
-     * 
+     * Removes all highlighting from the panel.
      */
     public void highlightNone() {
         this.higlightedOption = 0;
@@ -129,7 +128,7 @@ public class SudokuPanel extends JPanel {
     }
 
     /**
-     * 
+     * Updates the highlighted cells with any changes.
      */
     public void updateHighlights() {
         highlightOptions(this.higlightedOption);
