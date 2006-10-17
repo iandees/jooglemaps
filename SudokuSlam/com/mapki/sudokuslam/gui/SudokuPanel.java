@@ -1,10 +1,12 @@
 package com.mapki.sudokuslam.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 
 import javax.swing.JPanel;
-import javax.swing.border.LineBorder;
 
 import com.mapki.sudokuslam.game.SudokuGame;
 
@@ -15,11 +17,17 @@ import com.mapki.sudokuslam.game.SudokuGame;
  *
  */
 public class SudokuPanel extends JPanel {
+    public static final Color HIGHLIGHT_COLOR = new Color(1.0f, .9f, .5f);
+
+    public static final Color NORMAL_COLOR = Color.WHITE;
+
     private SudokuGame game;
     
     private SudokuCell[][] cells;
     private int cellWidth;
     private int cellHeight;
+
+    private short higlightedOption;
     
     public SudokuPanel(SudokuGame game, int width, int height) {
         this.game = game;
@@ -27,9 +35,15 @@ public class SudokuPanel extends JPanel {
         this.cellHeight = height;
         this.cellWidth = width;
         init();
-        
-        this.setBorder(new LineBorder(Color.GREEN, 5));
     }
+    
+//    public Dimension getMinimumSize() {
+//        return new Dimension(512, 512);
+//    }
+//    
+//    public Dimension getPreferredSize() {
+//        return getMinimumSize();
+//    }
     
     private void init() {
         this.setLayout(new GridLayout(this.cellHeight, this.cellWidth));
@@ -37,7 +51,6 @@ public class SudokuPanel extends JPanel {
         for(int i = 0; i < cellWidth; i++) {
             for(int j = 0; j < cellHeight; j++) {
                 cells[i][j] = new SudokuCell(this.game, this, i+1, j+1);
-                cells[i][j].setSize(100,100);
                 this.add(cells[i][j]);
             }
         }
@@ -51,6 +64,7 @@ public class SudokuPanel extends JPanel {
                 cells[i][j].setVisible(true);
             }
         }
+        repaint();
     }
 
     /**
@@ -60,5 +74,62 @@ public class SudokuPanel extends JPanel {
     public void selectCell(int row, int col) {
         game.selectCell(row, col);
         repaint();
+    }
+
+    /**
+     * @param n
+     */
+    public void highlightOptions(short n) {
+        this.higlightedOption = n;
+        
+        for (int i = 0; i < cellWidth; i++) {
+            for (int j = 0; j < cellHeight; j++) {
+                if(game.cellHasOption((short) (n-1), i+1, j+1)) {
+                    cells[i][j].setBackground(HIGHLIGHT_COLOR);
+                    cells[i][j].repaint();
+                }
+                
+                if(game.chosenNumber(i+1, j+1) == n) {
+                    cells[i][j].setBackground(HIGHLIGHT_COLOR);
+                    cells[i][j].repaint();
+                }
+            }
+        }
+    }
+
+    /**
+     * 
+     */
+    public void highlightNone() {
+        this.higlightedOption = 0;
+        
+        for (int i = 0; i < cellWidth; i++) {
+            for (int j = 0; j < cellHeight; j++) {
+                cells[i][j].setBackground(NORMAL_COLOR);
+            }
+        }
+    }
+
+    public void paint(Graphics g) {
+        super.paint(g);
+        
+        Graphics2D g2d = (Graphics2D) g;
+        
+        int firstThirdHeight = getHeight() / 3;
+        int firstThirdWidth = getWidth() / 3;
+        
+        g2d.setStroke(new BasicStroke(5));
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.drawLine(firstThirdWidth, 0, firstThirdWidth, getHeight());
+        g2d.drawLine(firstThirdWidth * 2, 0, firstThirdWidth * 2, getHeight());
+        g2d.drawLine(0, firstThirdHeight, getWidth(), firstThirdHeight);
+        g2d.drawLine(0, firstThirdHeight * 2, getWidth(), firstThirdHeight * 2);
+    }
+
+    /**
+     * 
+     */
+    public void updateHighlights() {
+        highlightOptions(this.higlightedOption);
     }
 }

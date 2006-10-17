@@ -1,6 +1,7 @@
 package com.mapki.sudokuslam.gui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -45,13 +46,22 @@ public class SudokuCell extends JPanel {
                 if (e.getClickCount() == 2) {
                     game.setCellNumber(i + 1, row, col);
                 } else if (e.getClickCount() == 1) {
-                    parent.selectCell(row, col);
                     game.clickedCellOption(i, row, col);
+                    parent.selectCell(row, col);
+                    parent.updateHighlights();
                 }
                 
                 repaint();
             }
         });
+    }
+    
+    public Dimension getMinimumSize() {
+        return new Dimension(51, 51);
+    }
+    
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
     }
 
     public void paint(Graphics g) {

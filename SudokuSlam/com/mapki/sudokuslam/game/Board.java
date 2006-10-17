@@ -21,11 +21,7 @@ public class Board {
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        int size = width * height;
         this.boardInfo = new Cell[width][height];
-        
-        int x = 0;
-        int y = 0;
         
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {

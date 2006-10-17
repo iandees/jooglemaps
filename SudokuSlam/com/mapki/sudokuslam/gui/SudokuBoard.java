@@ -1,6 +1,8 @@
 package com.mapki.sudokuslam.gui;
 
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -15,6 +17,7 @@ import com.mapki.sudokuslam.game.SudokuGame;
 public class SudokuBoard extends JFrame {
 
     private SudokuPanel sPanel;
+    private MovePanel mPanel;
     private SudokuGame game;
 
     /**
@@ -22,13 +25,22 @@ public class SudokuBoard extends JFrame {
      */
     public SudokuBoard(SudokuGame game) {
         super("SudokuSlam");
-        this.setSize(500,500);
+        this.setSize(700,700);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setLayout(new FlowLayout(FlowLayout.LEFT));
         
         this.game = game;
         initGui();
     }
 
+    public Dimension getMinimumSize() {
+        return new Dimension(700, 512);
+    }
+    
+    public Dimension getPreferredSize() {
+        return getMinimumSize();
+    }
+    
     /**
      * 
      */
@@ -57,36 +69,64 @@ public class SudokuBoard extends JFrame {
                 }
                 
                 if(e.getKeyCode() == KeyEvent.VK_1) {
-                    game.toggleSelectedCellOption(1);
+                    toggleSelectedCellOption(1);
                 } else if(e.getKeyCode() == KeyEvent.VK_2) {
-                    game.toggleSelectedCellOption(2);
+                    toggleSelectedCellOption(2);
                 } else if(e.getKeyCode() == KeyEvent.VK_3) {
-                    game.toggleSelectedCellOption(3);
+                    toggleSelectedCellOption(3);
                 } else if(e.getKeyCode() == KeyEvent.VK_4) {
-                    game.toggleSelectedCellOption(4);
+                    toggleSelectedCellOption(4);
                 } else if(e.getKeyCode() == KeyEvent.VK_5) {
-                    game.toggleSelectedCellOption(5);
+                    toggleSelectedCellOption(5);
                 } else if(e.getKeyCode() == KeyEvent.VK_6) {
-                    game.toggleSelectedCellOption(6);
+                    toggleSelectedCellOption(6);
                 } else if(e.getKeyCode() == KeyEvent.VK_7) {
-                    game.toggleSelectedCellOption(7);
+                    toggleSelectedCellOption(7);
                 } else if(e.getKeyCode() == KeyEvent.VK_8) {
-                    game.toggleSelectedCellOption(8);
+                    toggleSelectedCellOption(8);
                 } else if(e.getKeyCode() == KeyEvent.VK_9) {
-                    game.toggleSelectedCellOption(9);
+                    toggleSelectedCellOption(9);
                 }
                 repaint();
             }
         });
         
         c.add(sPanel);
+        
+        this.mPanel = new MovePanel(this.game, this);
+        
+        c.add(mPanel);
+    }
+
+    /**
+     * @param i
+     */
+    protected void toggleSelectedCellOption(int i) {
+        game.toggleSelectedCellOption(i);
+        repaint();
     }
 
     /**
      * 
      */
     public void start() {
+        this.sPanel.start();
+        this.mPanel.start();
         this.setVisible(true);
+    }
+
+    /**
+     * @param n
+     */
+    public void highlightOptions(short n) {
+        sPanel.highlightOptions(n);
+    }
+
+    /**
+     * 
+     */
+    public void highlightNone() {
+        sPanel.highlightNone();
     }
 
 }

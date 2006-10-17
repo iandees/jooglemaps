@@ -9,10 +9,13 @@ public class Cell {
     private boolean[] options;
     private int row;
     private int col;
+    private int panel;
     
     public Cell(int row, int col) {
         this(row, col, 0, new boolean[] {
-                false, false, false, false, false, false, false, false, false
+                false, false, false,
+                false, false, false,
+                false, false, false
         });
     }
 
@@ -32,8 +35,34 @@ public class Cell {
         
         this.selected = (byte) selected;
         this.options = numberChoices;
+        
+        panel = getPanel(row,col);
     }
     
+    /**
+     * @param row
+     * @param col
+     * @return
+     */
+    private int getPanel(int row, int col) {
+        int panely = 0;
+        int panelx = 0;
+        
+        if(row <= 9) {
+            panely = 2;
+        }
+        if(row <= 6) {
+            panely = 1;
+        }
+        if(row <= 3) {
+            panely = 0;
+        }
+        
+        panelx = (col-1) / 3;
+        
+        return (panely * 3) + panelx;
+    }
+
     public int getSelected() {
         return this.selected;
     }
@@ -98,6 +127,10 @@ public class Cell {
         return this.row;
     }
     
+    /**
+     * 
+     * @return
+     */
     public int getCol() {
         return this.col;
     }
