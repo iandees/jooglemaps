@@ -62,7 +62,7 @@ public class ShowOptionsPanel extends JPanel {
     }
 
     /**
-     * @param n
+     * @param n The segment that was clicked on.
      */
     public void selectSegment(short n) {
         if (segments[n - 1].getBackground() == IDLE_BACKGROUND) {
