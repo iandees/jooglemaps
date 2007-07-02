@@ -1,5 +1,6 @@
 package com.ian.google.maps.image;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.geom.Point2D;
@@ -161,17 +162,17 @@ public class TileLayer extends JPanel {
 		//Tiles neTiles = new Tiles(ne.lat(), ne.lng(), zoom);
 		//Point swTile = swTiles.getTileCoord();
 		//Point neTile = neTiles.getTileCoord();
-		Point swTile = getTileCoordinate(sw.lat(), sw.lng(), 17-zoom);
-		Point neTile = getTileCoordinate(ne.lat(), ne.lng(), 17-zoom);
+		Point swTile = getTileCoordinate(ne.lat(), sw.lng(), 17-zoom);
+		Point neTile = getTileCoordinate(sw.lat(), ne.lng(), 17-zoom);
 		
-		//System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
+		System.err.println("Painting... sw: " + swTile + " to ne: " + neTile);
 
         // Determine where in the window that tile should go
-		int swCornerX = lngToX(center.lng());
-		int swCornerY = latToY(center.lat());
+		int swCornerX = lngToX(ne.lng());
+		int swCornerY = latToY(sw.lat());
         // For each of the tiles in between the corner tiles...
-		for(int y = swTile.y+1; y > neTile.y-1; y--) {
-			for(int x = swTile.x-1; x < neTile.x+1; x++) {
+		for(int y = swTile.y; y < neTile.y; y++) {
+			for(int x = swTile.x; x < neTile.x; x++) {
                 // Determine the tile's lat/long coordinate
 				Rectangle2D.Double ll = getTileLatLong(x, y, zoom);
 				int tileCornerX = lngToX(ll.x);
@@ -182,7 +183,11 @@ public class TileLayer extends JPanel {
                 // Draw a rectangle over where the image is supposed to be
                 //g.drawRect(tileloc.x, tileloc.y, 256, 256);
                 g.drawImage(l.getImage(), tileloc.x, tileloc.y, this);
-				//System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
+                g.setColor(Color.white);
+                g.fillRect(tileloc.x, tileloc.y, 150, 15);
+                g.setColor(Color.black);
+                g.drawString("("+x+","+y+")", tileloc.x, tileloc.y+15);
+				System.err.println("Painting a tile: x: " + x + " y: " + y + " z: " + zoom + " @ " + tileloc);
 			}
 		}
 		super.paint(g);

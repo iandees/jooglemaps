@@ -61,7 +61,7 @@ public class GoogleMapPresentation extends JFrame {
 		});
 		
 		tileLayer = new TileLayer(this,
-		"http://mt3.google.com/mt?n=404&v=w2.25&");
+		"http://mt3.google.com/mt?n=404&v=w2.56&");
 		
 		Container c = this.getContentPane();
 		c.add(tileLayer);
@@ -127,7 +127,7 @@ public class GoogleMapPresentation extends JFrame {
 		
         // From the center of the view, move down to the left corner
         int swX = centerX + (windowWidth / 2);
-        int swY = centerY + (windowHeight / 2);
+        int swY = centerY - (windowHeight / 2);
         
         // Get the lat/lng for this point
         double swLng = tileLayer.xToLng(swX);
@@ -136,7 +136,7 @@ public class GoogleMapPresentation extends JFrame {
         
         // From the center, now move north and to the east to get the right corner
         int neX = centerX - (windowWidth / 2);
-        int neY = centerY - (windowHeight / 2);
+        int neY = centerY + (windowHeight / 2);
         
         // Get the lat/lng for this point
         double neLng = tileLayer.xToLng(neX);
